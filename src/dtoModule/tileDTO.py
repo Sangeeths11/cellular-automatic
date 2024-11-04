@@ -9,8 +9,11 @@ class TileDTO():
     def getTileStatus(self) -> TileStatus:
         return self.tileStatus
     
+    def setTileStatus(self, tileStatus: TileStatus) -> None:
+        self.tileStatus = tileStatus
+    
     def getPedestrianValue(self) -> float:
         return self.pedastrianValue
     
-    def setPedestrianValue(self) -> None:
-        return self.pedastrianValue
+    def setPedestrianValue(self, pedastrianValue: float) -> None:
+        self.pedastrianValue = pedastrianValue
