@@ -1,10 +1,12 @@
 from src.exceptions.simulationErrorCodes import SimulationErrorCodes
 from src.exceptions.simulationException import SimulationException
+from src.config.config import _Config
 
 class BaseSimulation():
 
-    def __init__(self, grid):
+    def __init__(self, grid, config: _Config):
         self.grid = grid
+        self.config = config
         self.tilesOverTime = []
 
     def simulateStep(self):

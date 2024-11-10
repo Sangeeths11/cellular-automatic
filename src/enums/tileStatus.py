@@ -1,6 +1,6 @@
 from enum import Enum
 
-def TileStatus(Enum):
+class TileStatus(Enum):
     FREE = 1
     BLOCKED = 2
     PEDESTRIAN = 3

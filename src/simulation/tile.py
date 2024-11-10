@@ -19,3 +19,17 @@ class Tile():
     def updatePedastrianValue(self) -> None:
         #TODO make some updatePolicy
         self.tileDTO.setPedestrianValue(uniform(1, 10))
+
+    def __repr__(self) -> str:
+        status: TileStatus = self.tileDTO.getTileStatus()
+        if status == TileStatus.FREE:
+            return "-"
+        if status == TileStatus.BLOCKED:
+            return "X"
+        if status == TileStatus.PEDESTRIAN:
+            return "O"
+        if status == TileStatus.SOURCE:
+            return "S"
+        if status == TileStatus.DESTINATION:
+            return "D"
+        return "N"
