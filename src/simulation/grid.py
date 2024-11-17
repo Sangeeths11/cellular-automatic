@@ -22,6 +22,11 @@ class Grid():
     def getTiles(self) -> list[list]:
         return self.tiles
     
+    def getTile(self, x: int, y: int) -> Tile:
+        if not self.contains(x, y):
+            raise SimulationException(SimulationErrorCodes.POINT_NOT_ON_GRID)
+        return self.tiles[x][y]
+        
     def simulate(self):
         #TODO: Create a smart way to step in time
         pass
@@ -30,8 +35,12 @@ class Grid():
         #TODO: Find a way to update the TileValues
         pass
 
+    def contains(self, x: int, y: int) -> bool:
+        return -1 < x < self.length and -1 <= y < self.width
+
     def _initTiles(self) -> list[list]:
         return [
             [Tile(TileDTO(TileStatus.FREE, 0)) for _ in range(self.width)]
             for __ in range(self.length)
         ]
+    
