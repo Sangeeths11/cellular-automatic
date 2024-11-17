@@ -42,4 +42,12 @@ class BaseSimulation():
         pass
 
     def __repr__(self) -> str:
-        return str(self.grid)
+        returnValue: str = "--- Base Simulation ---\n -- Grid --\n"
+        returnValue += str(self.grid)
+        returnValue += "\n -- Config --\n"
+        returnValue += str(self.config)
+        returnValue += "\n -- Spawners --\n"
+        for spawner in self.spawners:
+            returnValue += "---\n"
+            returnValue += str(spawner)
+        return returnValue

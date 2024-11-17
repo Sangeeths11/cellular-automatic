@@ -43,4 +43,4 @@ class BaseSpawner():
         return freeTiles
     
     def __repr__(self) -> str:
-        pass
+        return str(self.totalSpawend)
