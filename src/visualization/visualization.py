@@ -1,5 +1,7 @@
 import pygame
 import sys
+from src.enums.tileStatus import TileStatus
+
 
 class Visualization:
     def __init__(self, width=800, height=600):

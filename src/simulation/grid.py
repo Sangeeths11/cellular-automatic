@@ -22,10 +22,23 @@ class Grid():
     def getTiles(self) -> list[list]:
         return self.tiles
     
+    def getLength(self) -> int:
+        return self.length
+    
+    def getWidth(self) -> int:
+        return self.width
+    
     def getTile(self, x: int, y: int) -> Tile:
         if not self.contains(x, y):
             raise SimulationException(SimulationErrorCodes.POINT_NOT_ON_GRID)
         return self.tiles[x][y]
+    
+    def getTileStatus(self, x, y) -> TileStatus:
+        tile = self.getTile(x,y)
+        return tile.getTileStatus()
+    
+    def setTileStatus(self, x, y, tileStatus: TileStatus) -> None:
+        self.getTile(x,y).changeState(tileStatus)
         
     def simulate(self):
         #TODO: Create a smart way to step in time

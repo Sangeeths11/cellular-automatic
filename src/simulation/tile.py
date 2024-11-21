@@ -11,6 +11,9 @@ class Tile():
     def getTileDTO(self):
         return self.tileDTO
     
+    def getTileStatus(self) -> TileStatus:
+        return self.tileDTO.getTileStatus()
+    
     def changeState(self, tileStatus: TileStatus) -> bool:
         # TODO make some changeChecks
         self.tileDTO.setTileStatus(tileStatus)
