@@ -30,5 +30,6 @@ def run():
 
     for i in range(20):
         baseSimulation.simulateStep()
+        print(baseSimulation)
     
     baseSimulation.save("exampleSimulation")

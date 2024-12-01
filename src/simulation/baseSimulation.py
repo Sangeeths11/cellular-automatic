@@ -71,12 +71,12 @@ class BaseSimulation():
     def _updateAgent(self, agent: BaseAgent) -> None:
         pedestrianHeatMap: PedestrianHeapMap = self._getPedestrianHeatMapByName(agent.getLocomotionHeatMapName())
         targetPostion: Tuple[int, int] = self._getLowestFreePosition(agent, pedestrianHeatMap)
-        
-        self.grid.setTileStatus(*targetPostion, TileStatus.PEDESTRIAN)
-        self.grid.setTileStatus(agent.getCurrentLocationX(), agent.getCurrentLocationY(), TileStatus.FREE)
-        
-        agent.setCurrentLocationX(targetPostion[0])
-        agent.setCurrentLocationY(targetPostion[1])
+        if targetPostion:
+            self.grid.setTileStatus(*targetPostion, TileStatus.PEDESTRIAN)
+            self.grid.setTileStatus(agent.getCurrentLocationX(), agent.getCurrentLocationY(), TileStatus.FREE)
+            
+            agent.setCurrentLocationX(targetPostion[0])
+            agent.setCurrentLocationY(targetPostion[1])
 
     def _getPedestrianHeatMapByName(self, pedestrianHeatMapName: str) -> PedestrianHeapMap:
         for destination in self.destinations:
@@ -86,11 +86,11 @@ class BaseSimulation():
 
     def _getLowestFreePosition(self, agent: BaseAgent, pedestrianHeatMap: PedestrianHeapMap) -> Tuple[int, int]:
         reachableFields: Tuple[int, int, float] = self._getReachableFields(agent, pedestrianHeatMap)
-        sorted(reachableFields, key=lambda x: reachableFields[2], reverse=True)
+        reachableFields = sorted(reachableFields, key=lambda x: x[2])
         for x, y, _ in reachableFields:
             if (self.grid.getTileStatus(x, y) == TileStatus.FREE):
                 return (x, y)
-        return (agent.getCurrentLocationX(), agent.getCurrentLocationY())
+        return None
 
     def _getReachableFields(self, agent: BaseAgent, pedestrianHeatMap: PedestrianHeapMap) -> Tuple[int, int, float]:
         returnList: Tuple[int, int, float] = []

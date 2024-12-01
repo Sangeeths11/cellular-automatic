@@ -35,10 +35,13 @@ class BaseSpawner():
                 spawnedYPosition = self.spawnerTiles[currentSpawnerTilePosition].getYPositionOnGrid()
                 spawnedAgents.append(BaseAgent(spawnedXPosition, spawnedYPosition, self.locomotionHeatMapName))
             currentSpawnerTilePosition += 1
+        self.totalSpawend += len(spawnedAgents)
         return spawnedAgents
 
 
     def _getNumberOfSpawns(self) -> float:
+        if(self.totalSpawend >= self.numberOfTotalSpawns):
+            return 0
         return min(self.maxSpawnsPerBatch, self.numberOfTotalSpawns - self.totalSpawend, self._getNumberOfFreeTiles())
 
     def _getNumberOfFreeTiles(self) -> float:
