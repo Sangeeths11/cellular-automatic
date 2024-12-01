@@ -6,7 +6,7 @@ class SimulationExceptionTest(unittest.TestCase):
 
     def test_simulateStep_throws(self):
         # ARRANGE
-        baseSilumlation = BaseSimulation(None)
+        baseSilumlation = BaseSimulation(None, None)
 
         # ACT
         self.assertRaises(SimulationException, baseSilumlation.simulateStep)
