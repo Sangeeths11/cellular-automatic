@@ -19,7 +19,7 @@ def run():
     spawnerConfiguration = SpawnerConfiguration(spawnerTilesCoordinates, "Final", 4, 4)
     baseSimulation.setSpawner(spawnerConfiguration)
 
-    destinationCoordinates = [(9,9), (9,8), (9,7), (0,5)]
+    destinationCoordinates = [(9,9), (9,8), (9,7)]
     destinationName = "Final"
     locomotionAlgorithm = LocomationAlgorihms.dijksta
     destinationConfiguration = DestinationConfiguration(
@@ -28,12 +28,7 @@ def run():
         locomotionAlgorithm=locomotionAlgorithm)
     baseSimulation.setDestination(destinationConfiguration)
 
-    print(baseSimulation)
-    baseSimulation.simulateStep()
-    baseSimulation.simulateStep()
-    baseSimulation.simulateStep()
-    print(baseSimulation)
-    tilesOverTime = baseSimulation.getTilesOverTime()
-    for TileOverTime in tilesOverTime:
-        print(TileOverTime)
+    for i in range(20):
+        baseSimulation.simulateStep()
+    
     baseSimulation.save("exampleSimulation")
