@@ -9,6 +9,9 @@ class PedestrianHeapMap():
     def updateValue(self, x: int, y: int, value: float) -> None:
         #TODO Check for bounderies
         self.heatMap[x][y] = value
+
+    def isOnHeatMap(self, x: int, y: int) -> bool:
+        return not (x < 0 or y < 0 or x >= len(self.heatMap) or y >= len(self.heatMap[0]))
     
     def getValue(self, x: int, y:int) -> float:
         return self.heatMap[x][y]

@@ -38,14 +38,14 @@ class Dijkstra():
         for newX in range(currentNode[0] - 1, currentNode[0] + 2):
             for newY in range(currentNode[1] - 1, currentNode[1] + 2):
                 if self.grid.contains(newX, newY) and self.grid.getTileStatus(newX, newY) != TileStatus.BLOCKED:
-                    distance = 1 if self._isDiagonalStep(currentNode[0], currentNode[1], newX, newY) else np.sqrt(2)
+                    distance = np.sqrt(2) if self._isDiagonalStep(currentNode[0], currentNode[1], newX, newY) else 1
                     newValue = currentNode[2] + distance
                     if (self.pedestrianHeatMap.getValue(newX, newY) > newValue):
                         self.pedestrianHeatMap.updateValue(newX, newY, newValue)
                         self.stack.append((newX, newY, newValue))
     
     def _isDiagonalStep(self, x:int, y:int, xNew:int, yNew: int) -> bool:
-        return (x - xNew)*(y - yNew) == 0
+        return (x - xNew)*(y - yNew) != 0
 
 
     @classmethod

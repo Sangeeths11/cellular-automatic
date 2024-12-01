@@ -13,9 +13,13 @@ class BaseDestination():
         self.locomotionAlgorithm: LocomationAlgorihms = locomtionAlgorithm
         self.pedestrianHeatMap: PedestrianHeapMap = None
 
-    def generatePedestrianHeatMap(self) -> None:
+    def getDestinationName(self) -> str:
+        return self.destinationName
+
+    def generatePedestrianHeatMap(self) -> PedestrianHeapMap:
         if self.locomotionAlgorithm == LocomationAlgorihms.dijksta:
             self.pedestrianHeatMap = Dijkstra.generatePedestrianHeatMap(self.grid, self.destinationTiles)
+        return self.pedestrianHeatMap
     
     def getPedestrianHeatMap(self) -> PedestrianHeapMap:
         return self.pedestrianHeatMap

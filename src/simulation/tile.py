@@ -5,34 +5,34 @@ from random import uniform
 
 class Tile():
 
-    def __init__(self, tileDTO: TileDTO) -> None:
-        self.tileDTO = tileDTO
-
-    def getTileDTO(self):
-        return self.tileDTO
+    def __init__(self, xPositionOnGrid: int, yPositionOnGrid: int, tileStatus: TileStatus) -> None:
+        self.xPositionOnGrid = xPositionOnGrid
+        self.yPositionOnGrid= yPositionOnGrid
+        self.tileStatus: TileStatus = tileStatus
     
     def getTileStatus(self) -> TileStatus:
-        return self.tileDTO.getTileStatus()
+        return self.tileStatus
+    
+    def getXPositionOnGrid(self) -> int:
+        return self.xPositionOnGrid
+    
+    def getYPositionOnGrid(self) -> int:
+        return self.yPositionOnGrid
     
     def changeState(self, tileStatus: TileStatus) -> bool:
         # TODO make some changeChecks
-        self.tileDTO.setTileStatus(tileStatus)
+        self.tileStatus = tileStatus
         return True
-    
-    def updatePedastrianValue(self) -> None:
-        #TODO make some updatePolicy
-        self.tileDTO.setPedestrianValue(uniform(1, 10))
 
     def __repr__(self) -> str:
-        status: TileStatus = self.tileDTO.getTileStatus()
-        if status == TileStatus.FREE:
+        if self.tileStatus == TileStatus.FREE:
             return "-"
-        if status == TileStatus.BLOCKED:
+        if self.tileStatus == TileStatus.BLOCKED:
             return "X"
-        if status == TileStatus.PEDESTRIAN:
+        if self.tileStatus == TileStatus.PEDESTRIAN:
             return "O"
-        if status == TileStatus.SOURCE:
+        if self.tileStatus == TileStatus.SOURCE:
             return "S"
-        if status == TileStatus.DESTINATION:
+        if self.tileStatus == TileStatus.DESTINATION:
             return "D"
         return "N"
