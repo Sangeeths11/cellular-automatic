@@ -35,11 +35,15 @@ class GridBase[T](ABC):
     def _get_cell_coordinate(self, index: int) -> tuple[int, int]:
         return index % self._width, index // self._width
 
+
+    def is_in_bounds(self, x: int, y: int) -> bool:
+        return 0 <= x < self._width and 0 <= y < self._height
+
     """
     Raises a SimulationError if the given coordinates are out of bounds.
     """
     def check_bounds(self, x: int, y: int) -> None:
-        if x < 0 or x >= self._width or y < 0 or y >= self._height:
+        if not self.is_in_bounds(x, y):
             raise SimulationError(SimulationErrorCode.INVALID_COORDINATES, {"x": x, "y": y})
 
     def get_cell(self, x: int, y: int) -> T:
@@ -48,3 +52,13 @@ class GridBase[T](ABC):
 
     def get_cell_at_pos(self, pos: Position):
         return self.get_cell(pos.get_x(), pos.get_y())
+
+    def __contains__(self, item):
+        if isinstance(item, Cell):
+            return item in self.cells
+        elif isinstance(item, Position):
+            return self.is_in_bounds(item.get_x(), item.get_y())
+        elif isinstance(item, tuple) and len(item) == 2:
+            return self.is_in_bounds(*item)
+        else:
+            return False

@@ -39,3 +39,6 @@ class PathfindingQueue[T]:
     def push(self, item: T, priority: float):
         self._items.add(item)
         heapq.heappush(self._queue, PriorityItem(item, priority))
+
+    def is_empty(self):
+        return len(self._queue) == 0
