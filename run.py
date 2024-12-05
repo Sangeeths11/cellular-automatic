@@ -10,7 +10,7 @@ from visualisation.visualisation import Visualisation
 
 
 def main():
-    grid = SimulationGrid(10, 10, MooreNeighbourhood)
+    grid = SimulationGrid(20, 20, MooreNeighbourhood)
     for (x, y) in [(4,3),(5,3),(4,5),(5,4),(5,5)]:
         grid.get_cell(x, y).set_osbtacle()
 
