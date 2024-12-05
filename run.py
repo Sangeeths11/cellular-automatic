@@ -12,7 +12,10 @@ from visualisation.visualisation import Visualisation
 
 def main():
     grid = SimulationGrid(10, 10, MooreNeighbourhood)
-    for (x, y) in [(4,3),(5,3),(4,5),(5,4),(5,5)]:
+    obstacles_walls = [(2,0), (2,1), (2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (2, 7), (5, 9), (5,8), (5,7), (5,6), (5,5), (5,4), (5,3)]
+    obstacles_center = [(4,3),(5,3),(4,5),(5,4),(5,5)]
+
+    for (x, y) in obstacles_walls:
         grid.get_cell(x, y).set_osbtacle()
 
     distancing = EuclideanDistance()
@@ -31,7 +34,7 @@ def main():
 
     social_distancing = SocialDistancingHeatmapGenerator(distancing, 3, 3)
 
-    sim = Simulation(0.1, grid, distancing, social_distancing, [target, target2], [spawner, spawner2])
+    sim = Simulation(0.1, grid, distancing, social_distancing, [target], [spawner])
     vis = Visualisation(sim)
     vis.run()
 
