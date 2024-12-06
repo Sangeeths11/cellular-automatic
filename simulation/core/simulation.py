@@ -5,7 +5,7 @@ from simulation.core.target import Target
 from simulation.heatmaps.distancing.base_distance import DistanceBase
 from simulation.heatmaps.heatmap import Heatmap
 from simulation.heatmaps.heatmap_generator_base import HeatmapGeneratorBase
-from simulation.heatmaps.social_distancing_heatmap import SocialDistancingHeatmapGenerator
+from simulation.heatmaps.social_distancing_heatmap_generator import SocialDistancingHeatmapGenerator
 from simulation.neighbourhood.base_neighbourhood import NeighbourhoodBase
 from simulation.core.pedestrian import Pedestrian
 from simulation.core.simulation_grid import SimulationGrid

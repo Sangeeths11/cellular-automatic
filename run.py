@@ -7,7 +7,7 @@ from simulation.core.target import Target
 from simulation.heatmaps.distancing.euclidean_distance import EuclideanDistance
 from simulation.heatmaps.djisktra_heatmap_generator import DijkstraHeatmapGenerator
 from simulation.heatmaps.fast_marching_heatmap_generator import FastMarchingHeatmapGenerator
-from simulation.heatmaps.social_distancing_heatmap import SocialDistancingHeatmapGenerator
+from simulation.heatmaps.social_distancing_heatmap_generator import SocialDistancingHeatmapGenerator
 from simulation.neighbourhood.moore_neighbourhood import MooreNeighbourhood
 from visualisation.visualisation import Visualisation
 
