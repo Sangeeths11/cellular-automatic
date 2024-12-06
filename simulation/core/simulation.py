@@ -13,7 +13,7 @@ from utils.immutable_list import ImmutableList
 
 
 class Simulation:
-    def __init__(self, time_resolution: float, grid: SimulationGrid, distancing: DistanceBase, social_distancing: SocialDistancingHeatmapGenerator, targets: list[Target], spawners: list[Spawner], occupation_bias_modifier: float|None = 1.0):
+    def __init__(self, time_resolution: float, grid: SimulationGrid, distancing: DistanceBase, social_distancing: SocialDistancingHeatmapGenerator, targets: list[Target], spawners: list[Spawner], occupation_bias_modifier: float|None = 1.0, retargeting_threshold: float|None = -1.0):
         self._pedestrians: list[Pedestrian] = list()
         self._grid: SimulationGrid = grid
         self._targets: list[Target] = targets
@@ -25,6 +25,7 @@ class Simulation:
         self._run_time: float = 0
         self._time_resolution: float = time_resolution
         self._occupation_bias_modifier: float|None = occupation_bias_modifier
+        self._retargeting_threshold: float|None = retargeting_threshold
 
     def get_spawners(self) -> ImmutableList[Spawner]:
         return ImmutableList(self._spawners)
@@ -133,7 +134,9 @@ class Simulation:
             elif pedestrian.has_targeted_cell() is False:
                 new_target_cell = self._get_pedestrian_target_cell(pedestrian)
                 pedestrian.set_target_cell(new_target_cell)
-            elif pedestrian.get_targeted_cell().is_occupied(): # if the target cell is occupied, try to find a new target cell to avoid deadlocks
+
+                # if the target cell is occupied, try to find a new target cell to avoid deadlocks
+            elif pedestrian.get_targeted_cell().is_occupied() and self._retargeting_threshold is not None and self._retargeting_threshold > pedestrian.get_current_distance():
                 new_target_cell = self._get_pedestrian_target_cell(pedestrian)
                 pedestrian.set_target_cell(new_target_cell)
 

@@ -25,20 +25,20 @@ class SocialDistancingHeatmapGenerator(HeatmapGeneratorBase):
         :param blocked: set of CellStates that are considered blocked, default is {CellState.OCCUPIED}
         """
         super().__init__()
-        self._distancing = distancing
-        self._width = width
-        self._height = height
-        self._neighbour_width = math.ceil(width / 2)
-        self._neighbour_height = math.ceil(height / 2)
-        self._blocked = {CellState.OCCUPIED}
+        self._distancing: DistanceBase = distancing
+        self._width: float = width
+        self._height: float = height
+        self._neighbour_width: int = math.ceil(width / 2)
+        self._neighbour_height: int = math.ceil(height / 2)
+        self._blocked: set[CellState] = blocked or {CellState.OCCUPIED}
 
     def get_bias(self, center: Position, neighbour: Position):
-        return self.calculate_value(self._distancing.calculate_distance(center, neighbour))
+        return self._calculate_value(self._distancing.calculate_distance(center, neighbour))
 
     def get_max_value(self):
-        return self.calculate_value(self._width - 0.01)
+        return self._calculate_value(self._width - 0.01)
 
-    def calculate_value(self, distance: float):
+    def _calculate_value(self, distance: float):
         if abs(distance) < self._width:
             return self._height * math.exp(1/(math.pow(distance/self._width, 2) - 1))
         else:
@@ -53,11 +53,11 @@ class SocialDistancingHeatmapGenerator(HeatmapGeneratorBase):
         heatmap = Heatmap(grid.get_width(), grid.get_height(), 0.0)
         for cell in target:
             if cell.get_state() in self._blocked:
-                heatmap.set_cell_at_pos(cell, Heatmap.INFINITY)
+                heatmap.set_cell_at_pos(cell, self._calculate_value(0))
                 for neighbour in grid.get_neighbours_at(cell, self._neighbour_width, self._neighbour_height):
                     current_value = heatmap.get_cell_at_pos(neighbour)
                     if current_value is not Heatmap.INFINITY :
-                        value = self.calculate_value(self._distancing.calculate_distance(cell, neighbour))
+                        value = self._calculate_value(self._distancing.calculate_distance(cell, neighbour))
                         heatmap.set_cell_at_pos(neighbour, current_value + value)
 
         return heatmap

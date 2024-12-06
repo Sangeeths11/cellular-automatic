@@ -36,7 +36,7 @@ def main():
     for (x, y) in obstacles_walls:
         grid.get_cell(x, y).set_osbtacle()
 
-    distancing = EuclideanDistance()
+    distancing = EuclideanDistance(1.0)
     dijkstra = DijkstraHeatmapGenerator(distancing)
     fast_marching = FastMarchingHeatmapGenerator(distancing, 1.0, {CellState.OBSTACLE})
 
@@ -52,7 +52,7 @@ def main():
 
     social_distancing = SocialDistancingHeatmapGenerator(distancing, 3, 3)
 
-    sim = Simulation(0.1, grid, distancing, social_distancing, [target], [spawner], 2.0)
+    sim = Simulation(0.1, grid, distancing, social_distancing, [target], [spawner], 2.0, -2.0)
     vis = Visualisation(sim)
     vis.run()
 
