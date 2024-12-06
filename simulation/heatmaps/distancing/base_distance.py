@@ -12,5 +12,8 @@ class DistanceBase(ABC):
     def _calculate_distance(self, pos1: Position, pos2: Position) -> float:
         pass
 
+    def get_scale(self) -> float:
+        return self._scale
+
     def calculate_distance(self,  pos1: Position, pos2: Position) -> float:
         return self._calculate_distance(pos1, pos2) * self._scale

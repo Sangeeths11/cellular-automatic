@@ -17,7 +17,7 @@ class SocialDistancingHeatmapGenerator(HeatmapGeneratorBase):
     Heatmap generator which adds a social distancing force from each occupied cell
     """
 
-    def __init__(self, distancing: DistanceBase, width: float, height: float, blocked: set[CellState] = None):
+    def __init__(self, distancing: DistanceBase, width: float, height: float, blocked: set[CellState] = None, intensity: float = 1.0):
         """
         :param distancing: algorithm for calculating distance between cells
         :param width: width of the social distancing force
@@ -31,6 +31,7 @@ class SocialDistancingHeatmapGenerator(HeatmapGeneratorBase):
         self._neighbour_width: int = math.ceil(width / 2)
         self._neighbour_height: int = math.ceil(height / 2)
         self._blocked: set[CellState] = blocked or {CellState.OCCUPIED}
+        self._intensity: float = intensity
 
     def get_bias(self, center: Position, neighbour: Position):
         return self._calculate_value(self._distancing.calculate_distance(center, neighbour))
@@ -40,7 +41,7 @@ class SocialDistancingHeatmapGenerator(HeatmapGeneratorBase):
 
     def _calculate_value(self, distance: float):
         if abs(distance) < self._width:
-            return self._height * math.exp(1/(math.pow(distance/self._width, 2) - 1))
+            return self._intensity * (self._height * math.exp(1/(math.pow(distance/self._width, 2) - 1)))
         else:
             return 0
 

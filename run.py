@@ -13,17 +13,33 @@ from visualisation.visualisation import Visualisation
 
 def test_large():
     grid = SimulationGrid(100, 100, MooreNeighbourhood)
-    for i in range(0, 90):
+    for i in range(0, 80):
         grid.get_cell(49, i).set_osbtacle()
         grid.get_cell(50, i).set_osbtacle()
         grid.get_cell(51, i).set_osbtacle()
 
+    for i in range(10, 52):
+        grid.get_cell(i, 79).set_osbtacle()
+        grid.get_cell(i, 80).set_osbtacle()
+        grid.get_cell(i, 81).set_osbtacle()
+
+    for i in range(25, 75):
+        grid.get_cell(i, 49).set_osbtacle()
+        grid.get_cell(i, 50).set_osbtacle()
+        grid.get_cell(i, 51).set_osbtacle()
+
+    for i in range(40, 82):
+        grid.get_cell(10, i).set_osbtacle()
+        grid.get_cell(11, i).set_osbtacle()
+        grid.get_cell(12, i).set_osbtacle()
+
     distancing = EuclideanDistance(0.1)
+    fast_marching = FastMarchingHeatmapGenerator(distancing, {CellState.OBSTACLE})
     dijkstra = DijkstraHeatmapGenerator(distancing)
-    target = Target("Target", [grid.get_cell(99, 0), grid.get_cell(99, 1), grid.get_cell(99, 2)], grid, dijkstra)
-    spawner = Spawner("Spawner", distancing, [grid.get_cell(0, 0), grid.get_cell(0, 1), grid.get_cell(0, 2),], [target], 10, 1, 2, 0)
-    social_distancing = SocialDistancingHeatmapGenerator(distancing, 3, 3)
-    sim = Simulation(0.1, grid, distancing, social_distancing, [target], [spawner])
+    target = Target("Target", [grid.get_cell(52, 0), grid.get_cell(52, 1), grid.get_cell(52, 2)], grid, fast_marching)
+    spawner = Spawner("Spawner", distancing, [grid.get_cell(0, 0), grid.get_cell(0, 1), grid.get_cell(0, 2), grid.get_cell(0, 3), grid.get_cell(0, 4), grid.get_cell(0, 5), grid.get_cell(0, 6)], [target], 100, 2, 1, 0)
+    social_distancing = SocialDistancingHeatmapGenerator(distancing, 3, 3, {CellState.OCCUPIED}, 0.1)
+    sim = Simulation(0.1, grid, distancing, social_distancing, [target], [spawner], None, -1.0)
     visualisation = Visualisation(sim, 10, 30)
     visualisation.run()
 
@@ -38,11 +54,11 @@ def main():
 
     distancing = EuclideanDistance(1.0)
     dijkstra = DijkstraHeatmapGenerator(distancing)
-    fast_marching = FastMarchingHeatmapGenerator(distancing, 1.0, {CellState.OBSTACLE})
+    fast_marching = FastMarchingHeatmapGenerator(distancing, {CellState.OBSTACLE})
 
     target_cells = [grid.get_cell(x, y) for (x, y) in [(9, 9), (9, 8), (9, 7)]]
     target = Target("Target", target_cells, grid, fast_marching)
-    target2 = Target("Target2", [grid.get_cell(0, 9), grid.get_cell(1, 9)], grid, fast_marching)
+    target2 = Target("Target2", [grid.get_cell(0, 9), grid.get_cell(1, 9)], grid, dijkstra)
 
     spawner_cells = [grid.get_cell(x, y) for (x, y) in [(0, 0), (0, 1), (1, 0), (1, 1)]]
     spawner = Spawner("Spawner", distancing, spawner_cells, [target], 20, 2, 1, 0)
@@ -58,4 +74,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    test_large()

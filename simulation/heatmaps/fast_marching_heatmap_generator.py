@@ -17,7 +17,7 @@ class FastMarchingHeatmapGenerator(HeatmapGeneratorBase):
     """
     Heatmap generator using the Fast Marching Method
     """
-    def __init__(self, distancing: DistanceBase, delta_x: float = 1.0, blocked=None):
+    def __init__(self, distancing: DistanceBase, blocked=None):
         """
         :param distancing: algorithm for calculating distance between cells
         :param delta_x: distance between cells
@@ -28,7 +28,7 @@ class FastMarchingHeatmapGenerator(HeatmapGeneratorBase):
             blocked = {CellState.OBSTACLE}
         self._narrowband = NeumannNeighbourhood(1, 1)
         self._distancing = distancing
-        self._delta_x = delta_x
+        self._delta_x = distancing.get_scale()
         self._blocked = blocked if blocked is not None else {CellState.OBSTACLE}
 
     def _get_narrow_band(self, cell: Cell, grid: SimulationGrid) -> Generator[Cell]:
