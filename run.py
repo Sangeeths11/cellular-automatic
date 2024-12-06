@@ -1,3 +1,4 @@
+import json
 from simulation.core.cell_state import CellState
 from simulation.core.simulation import Simulation
 from simulation.core.simulation_grid import SimulationGrid
@@ -10,6 +11,25 @@ from simulation.heatmaps.social_distancing_heatmap import SocialDistancingHeatma
 from simulation.neighbourhood.moore_neighbourhood import MooreNeighbourhood
 from visualisation.visualisation import Visualisation
 
+def load_config(config_file):
+    with open(config_file, 'r') as file:
+        return json.load(file)
+    
+def create_heatmap_generator(generator_name, distancing):
+    if generator_name == "FastMarchingHeatmapGenerator":
+        return FastMarchingHeatmapGenerator(distancing, {CellState.OBSTACLE})
+    elif generator_name == "DijkstraHeatmapGenerator":
+        return DijkstraHeatmapGenerator(distancing)
+    raise ValueError(f"Unsupported heatmap generator: {generator_name}")
+
+def get_neighbourhood_class(neighbourhood_name):
+    """Map the neighbourhood name from JSON to the actual class."""
+    neighbourhood_mapping = {
+        "MooreNeighbourhood": MooreNeighbourhood,
+    }
+    if neighbourhood_name in neighbourhood_mapping:
+        return neighbourhood_mapping[neighbourhood_name]
+    raise ValueError(f"Unsupported neighbourhood type: {neighbourhood_name}")
 
 def test_large():
     grid = SimulationGrid(100, 100, MooreNeighbourhood)
@@ -44,34 +64,53 @@ def test_large():
     visualisation.run()
 
 def main():
-    grid = SimulationGrid(10, 10, MooreNeighbourhood)
-    obstacles_walls = [(2, 0), (2, 1), (2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (2, 7), (5, 9), (5, 8), (5, 7), (5, 6),
-                       (5, 5), (5, 4), (5, 3)]
-    obstacles_center = [(4, 3), (5, 3), (4, 5), (5, 4), (5, 5)]
+    simulation_config = load_config("simulation_config.json")
 
-    for (x, y) in obstacles_walls:
+    neighbourhood_class = get_neighbourhood_class(simulation_config["grid"]["neighbourhood"])
+    grid = SimulationGrid(simulation_config["grid"]["width"], simulation_config["grid"]["height"], neighbourhood_class)
+    
+    for (x, y) in simulation_config["obstacles"]["walls"]:
         grid.get_cell(x, y).set_osbtacle()
 
     distancing = EuclideanDistance(1.0)
-    dijkstra = DijkstraHeatmapGenerator(distancing)
-    fast_marching = FastMarchingHeatmapGenerator(distancing, {CellState.OBSTACLE})
 
-    target_cells = [grid.get_cell(x, y) for (x, y) in [(9, 9), (9, 8), (9, 7)]]
-    target = Target("Target", target_cells, grid, fast_marching)
-    target2 = Target("Target2", [grid.get_cell(0, 9), grid.get_cell(1, 9)], grid, dijkstra)
+    target_mapping = {}
+    for target_config in simulation_config["targets"]:
+        target_cells = [grid.get_cell(x, y) for (x, y) in target_config["cells"]]
+        heatmap_generator = create_heatmap_generator(target_config["heatmap_generator"], distancing)
+        target_obj = Target(target_config["name"], target_cells, grid, heatmap_generator)
+        target_mapping[target_config["name"]] = target_obj
 
-    spawner_cells = [grid.get_cell(x, y) for (x, y) in [(0, 0), (0, 1), (1, 0), (1, 1)]]
-    spawner = Spawner("Spawner", distancing, spawner_cells, [target], 20, 2, 1, 0)
+    
+    spawners = []
+    for spawner_config in simulation_config["spawners"]:
+        spawner_cells = [grid.get_cell(x, y) for (x, y) in spawner_config["cells"]]
+        spawner_targets = [target_mapping[name] for name in spawner_config["targets"]]
+        spawners.append(Spawner(
+            spawner_config["name"], distancing, spawner_cells, spawner_targets,
+            spawner_config["total_spawns"], spawner_config["batch_size"],
+            spawner_config["spawn_delay"], spawner_config["initial_delay"]
+        ))
 
-    spawner_cells_2 = [grid.get_cell(x, y) for (x, y) in [(9, 0), (8, 0), (9, 1), (8, 1)]]
-    spawner2 = Spawner("Spawner2", distancing, spawner_cells_2, [target2], 10, 1, 2, 0)
+    social_distancing = SocialDistancingHeatmapGenerator(
+        distancing,
+        simulation_config["social_distancing"]["width"],
+        simulation_config["social_distancing"]["height"]
+    )
 
-    social_distancing = SocialDistancingHeatmapGenerator(distancing, 3, 3)
-
-    sim = Simulation(0.1, grid, distancing, social_distancing, [target], [spawner], 2.0, -2.0)
+    sim = Simulation(
+        simulation_config["simulation"]["time_resolution"],
+        grid,
+        distancing,
+        social_distancing,
+        list(target_mapping.values()),
+        spawners,
+        simulation_config["simulation"].get("occupation_bias_modifier", 1.0),
+        simulation_config["simulation"].get("retargeting_threshold", -1.0)
+    )
     vis = Visualisation(sim)
     vis.run()
 
 
 if __name__ == "__main__":
-    test_large()
+    main()
