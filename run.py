@@ -13,8 +13,9 @@ def main():
     neighbourhood_class = SimulationConfigLoader.get_neighbourhood_class(simulation_config["grid"]["neighbourhood"])
     grid = SimulationGrid(simulation_config["grid"]["width"], simulation_config["grid"]["height"], neighbourhood_class)
     
-    for (x, y) in simulation_config["obstacles"]["walls"]:
-        grid.get_cell(x, y).set_osbtacle()
+    for obstacle in simulation_config["obstacles"]:
+        for (x, y) in obstacle["cells"]:
+            grid.get_cell(x, y).set_osbtacle() 
 
     distance_class = SimulationConfigLoader.get_distance_class(simulation_config["distancing"]["type"])
     distancing = distance_class(simulation_config["distancing"]["scale"])
