@@ -44,3 +44,9 @@ class Cell(Position):
 
     def is_free(self):
         return self._state == CellState.FREE
+
+    def get_pedestrian(self) -> 'Pedestrian':
+        return self._pedestrian
+
+    def is_occupied(self):
+        return self._state == CellState.OCCUPIED

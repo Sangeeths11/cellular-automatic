@@ -1,4 +1,5 @@
 import math
+from typing import Tuple
 
 import pygame
 from simulation.core.cell_state import CellState
@@ -25,6 +26,7 @@ class Visualisation:
         self._render_static_names = cell_size > 40
         self._render_pedestrian_info = cell_size > 20
         self._render_heatmap_info = cell_size > 30
+        self._render_pedestrian_target_line = cell_size > 30
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -69,6 +71,28 @@ class Visualisation:
     def _get_x_center_pos(self, pos: Position, y_offset=0):
         return pos.get_x() * self.cell_size + self.cell_size // 2, pos.get_y() * self.cell_size + Visualisation.GRID_OFFSET + y_offset
 
+    def _rotated(self, point: Tuple[float, float], origin: Tuple[float, float], angle: float):
+        ox, oy = origin
+        px, py = point
+        qx = ox + math.cos(angle) * (px - ox) - math.sin(angle) * (py - oy)
+        qy = oy + math.sin(angle) * (px - ox) + math.cos(angle) * (py - oy)
+        return qx, qy
+
+    def _get_small_triangle(self, pos: Position, rotation: float = 0.0):
+        half_size = self.cell_size // 2
+        fourth_size = self.cell_size // 4
+        origin = (pos.get_x() * self.cell_size + half_size, pos.get_y() * self.cell_size + half_size + Visualisation.GRID_OFFSET)
+        left = pos.get_x() * self.cell_size
+        bottom = pos.get_y() * self.cell_size + fourth_size + half_size + Visualisation.GRID_OFFSET
+        top = pos.get_y() * self.cell_size + Visualisation.GRID_OFFSET
+        a = (left + fourth_size, bottom)
+        b = (left + fourth_size + half_size, bottom)
+        c = (left + half_size, top + fourth_size)
+
+        triangle = [a,b,c]
+        return [self._rotated(point, origin, rotation + math.pi/2) for point in triangle]
+
+
     def render_grid(self):
         for x in range(self.simulation.get_grid().get_width()):
             for y in range(self.simulation.get_grid().get_height()):
@@ -81,8 +105,18 @@ class Visualisation:
     def render_pedestrians(self):
         font = pygame.font.Font(None, 20)
         for pedestrian in self.simulation.get_pedestrians():
-            rect = self._get_small_rect(pedestrian)
-            pygame.draw.rect(self.screen, (0, 0, 255), rect)
+            if pedestrian.has_targeted_cell():
+                target = pedestrian.get_targeted_cell()
+                if self._render_pedestrian_target_line:
+                    pygame.draw.line(self.screen, (0, 0, 255), self._get_center_pos(pedestrian), self._get_center_pos(target), 2)
+
+                angle = math.atan2(target.get_y() - pedestrian.get_y(), target.get_x() - pedestrian.get_x())
+                triangle = self._get_small_triangle(pedestrian, angle)
+                pygame.draw.polygon(self.screen, (0, 0, 255), triangle)
+            else:
+                rect = self._get_small_rect(pedestrian)
+                pygame.draw.rect(self.screen, (0, 0, 255), rect)
+
             if self._render_pedestrian_info:
                 speed_info = font.render(f"[{pedestrian.get_id()}] {pedestrian.get_average_speed():.2f}m/s, {pedestrian.get_optimal_speed():.2f}m/s", True, (0, 0, 0))
                 text_pos = self._get_x_center_pos(pedestrian, speed_info.get_height())
@@ -138,6 +172,8 @@ class Visualisation:
 
                 if self._include_social_distancing:
                     value += social_distancing_heatmap.get_cell(x, y)
+
+
 
                 ratio = min(value, self._max_heatmap_value) / self._max_heatmap_value
                 color = self._mix_colors((255, 200, 0), (0, 100, 255), ratio)

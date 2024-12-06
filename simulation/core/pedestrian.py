@@ -55,7 +55,7 @@ class Pedestrian(Position):
         return self._target_cell
 
     def can_move(self) -> bool:
-        return self._current_distance < 0 and self.has_target() and self._target_cell.is_free()
+        return self._current_distance < 0 and self.has_targeted_cell() and self._target_cell.is_free()
 
     def move(self) -> None:
         if not self.can_move():
@@ -67,6 +67,12 @@ class Pedestrian(Position):
         self._total_distance_moved += self._distance_to_target
         self.set_target_cell(None)
         self._distance_to_target = Pedestrian.INFINITY
+
+    def get_occupation_bias(self) -> float:
+        if self._target_cell is None:
+            return 1
+        else:
+            return 1.0 - (max(0.0, self._current_distance)/self._distance_to_target)
 
     def get_average_speed(self) -> float:
         return self._total_distance_moved / self._time_alive
@@ -87,5 +93,5 @@ class Pedestrian(Position):
     def get_heatmap(self) -> 'Heatmap':
         return self._target.get_heatmap()
 
-    def has_target(self):
+    def has_targeted_cell(self):
         return self._target_cell is not None

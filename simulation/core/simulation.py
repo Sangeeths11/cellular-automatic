@@ -13,7 +13,7 @@ from utils.immutable_list import ImmutableList
 
 
 class Simulation:
-    def __init__(self, time_resolution: float, grid: SimulationGrid, distancing: DistanceBase, social_distancing: SocialDistancingHeatmapGenerator, targets: list[Target], spawners: list[Spawner]):
+    def __init__(self, time_resolution: float, grid: SimulationGrid, distancing: DistanceBase, social_distancing: SocialDistancingHeatmapGenerator, targets: list[Target], spawners: list[Spawner], occupation_bias_modifier: float|None = 1.0):
         self._pedestrians: list[Pedestrian] = list()
         self._grid: SimulationGrid = grid
         self._targets: list[Target] = targets
@@ -24,6 +24,7 @@ class Simulation:
         self._steps: int = 0
         self._run_time: float = 0
         self._time_resolution: float = time_resolution
+        self._occupation_bias_modifier: float|None = occupation_bias_modifier
 
     def get_spawners(self) -> ImmutableList[Spawner]:
         return ImmutableList(self._spawners)
@@ -94,6 +95,15 @@ class Simulation:
         for target in self._targets:
             target.update_heatmap()
 
+    def _get_cell_value(self, pedestrian: Pedestrian, cell: Cell, heatmap: Heatmap) -> float:
+        value = heatmap.get_cell_at_pos(cell)
+        value += self._distancing_heatmap.get_cell_at_pos(cell)
+        value -= self._social_distancing_generator.get_bias(pedestrian, cell)
+        if self._occupation_bias_modifier is not None:
+            value += (self._occupation_bias_modifier * cell.get_pedestrian().get_occupation_bias()) if cell.is_occupied() else 0
+
+        return value
+
     def _get_pedestrian_target_cell(self, pedestrian: Pedestrian) -> Cell | None:
         if pedestrian.is_inside_target():
             pedestrian.get_target().increment_exit_count()
@@ -105,10 +115,8 @@ class Simulation:
 
             # TODO: move lambda to separate function
             # TODO: instead of ignoring occupied cells, try to add a penalty to them
-            for cell in sorted(neighbours, key=lambda n: heatmap.get_cell_at_pos(n) +
-                                                         self._distancing_heatmap.get_cell_at_pos(n) -
-                                                         self._social_distancing_generator.get_bias(pedestrian, n)):
-                if cell.is_free():
+            for cell in sorted(neighbours, key=lambda n: self._get_cell_value(pedestrian, n, heatmap)):
+                if self._occupation_bias_modifier is not None or cell.is_free():
                     return cell
 
             return None
@@ -122,8 +130,12 @@ class Simulation:
                 pedestrian.move()
                 new_target_cell = self._get_pedestrian_target_cell(pedestrian)
                 pedestrian.set_target_cell(new_target_cell)
-            elif pedestrian.has_target() is False:
+            elif pedestrian.has_targeted_cell() is False:
                 new_target_cell = self._get_pedestrian_target_cell(pedestrian)
                 pedestrian.set_target_cell(new_target_cell)
+            elif pedestrian.get_targeted_cell().is_occupied(): # if the target cell is occupied, try to find a new target cell to avoid deadlocks
+                new_target_cell = self._get_pedestrian_target_cell(pedestrian)
+                pedestrian.set_target_cell(new_target_cell)
+
 
 

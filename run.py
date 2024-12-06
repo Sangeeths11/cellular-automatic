@@ -45,14 +45,14 @@ def main():
     target2 = Target("Target2", [grid.get_cell(0, 9), grid.get_cell(1, 9)], grid, fast_marching)
 
     spawner_cells = [grid.get_cell(x, y) for (x, y) in [(0, 0), (0, 1), (1, 0), (1, 1)]]
-    spawner = Spawner("Spawner", distancing, spawner_cells, [target], 10, 1, 2, 0)
+    spawner = Spawner("Spawner", distancing, spawner_cells, [target], 20, 2, 1, 0)
 
     spawner_cells_2 = [grid.get_cell(x, y) for (x, y) in [(9, 0), (8, 0), (9, 1), (8, 1)]]
     spawner2 = Spawner("Spawner2", distancing, spawner_cells_2, [target2], 10, 1, 2, 0)
 
     social_distancing = SocialDistancingHeatmapGenerator(distancing, 3, 3)
 
-    sim = Simulation(0.1, grid, distancing, social_distancing, [target], [spawner])
+    sim = Simulation(0.1, grid, distancing, social_distancing, [target], [spawner], 2.0)
     vis = Visualisation(sim)
     vis.run()
 
