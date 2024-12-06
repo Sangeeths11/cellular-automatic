@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from simulation.core.cell import Cell
     from simulation.core.target import Target
+    from simulation.core.spawner import Spawner
     from simulation.heatmaps.heatmap import Heatmap
     from simulation.heatmaps.distancing.base_distance import DistanceBase
 
@@ -20,18 +21,20 @@ class Pedestrian(Position):
         Pedestrian.ID_COUNTER += 1
         return Pedestrian.ID_COUNTER
 
-    def __init__(self, x: int, y: int, speed: float, target: 'Target', distancing: 'DistanceBase'):
+    def __init__(self, x: int, y: int, speed: float, spawner: 'Spawner', target: 'Target', distancing: 'DistanceBase'):
         super().__init__(x, y)
         self._id: int = Pedestrian.get_next_id()
         self._optimal_speed: float = speed
         self._current_speed: float = speed
         self._target: 'Target' = target
+        self._spawner: 'Spawner' = spawner
         self._current_distance: float = Pedestrian.INFINITY
         self._distance_to_target: float = Pedestrian.INFINITY
         self._distancing: 'DistanceBase' = distancing
         self._target_cell: 'Cell' | None = None
         self._time_alive: float = 0
         self._total_distance_moved: float = 0
+        self._refund_distance_flag = False
 
     def set_target_cell(self, target_cell: 'Cell') -> None:
         if target_cell is None:
@@ -41,9 +44,17 @@ class Pedestrian(Position):
             if target_cell.get_position() == self.get_position():
                 raise SimulationError(SimulationErrorCode.ALREADY_IN_CELL, {"cell": target_cell})
 
-            self._current_distance = self._distancing.calculate_distance(self, target_cell)
+            if self._refund_distance_flag and self._current_distance is not Pedestrian.NEGATIVE_INFINITY and self._current_distance is not Pedestrian.INFINITY:
+                self._current_distance += self._distancing.calculate_distance(self, target_cell)
+            else:
+                self._current_distance = self._distancing.calculate_distance(self, target_cell)
+
             self._distance_to_target = self._current_distance
             self._target_cell = target_cell
+            self._refund_distance_flag = True
+
+    def get_spawner(self) -> 'Spawner':
+        return self._spawner
 
     def get_id(self) -> int:
         return self._id
@@ -65,7 +76,7 @@ class Pedestrian(Position):
         self._x = self._target_cell.get_x()
         self._y = self._target_cell.get_y()
         self._total_distance_moved += self._distance_to_target
-        self.set_target_cell(None)
+        # self.set_target_cell(None)
         self._distance_to_target = Pedestrian.INFINITY
 
     def get_occupation_bias(self) -> float:
@@ -79,6 +90,9 @@ class Pedestrian(Position):
 
     def update(self, delta: float):
         self._time_alive += delta
+        if self._current_distance < 0:
+            self._refund_distance_flag = False
+
         self._current_distance -= self._current_speed * delta
 
     def get_current_distance(self) -> float:

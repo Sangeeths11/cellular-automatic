@@ -58,5 +58,5 @@ class Spawner:
             cell = free_cells[spawn_index]
             target = random.choice(self._targets)
             speed = self.SPEED_DISTRIBUTION.sample()
-            pedestrian = Pedestrian(cell.get_x(), cell.get_y(), speed, target, self._distancing)
+            pedestrian = Pedestrian(cell.get_x(), cell.get_y(), speed, self, target, self._distancing)
             yield pedestrian

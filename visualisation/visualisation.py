@@ -1,7 +1,10 @@
 import math
+from random import random
 from typing import Tuple
 
 import pygame
+from pygame import Color
+
 from simulation.core.cell_state import CellState
 from simulation.core.position import Position
 from simulation.core.simulation import Simulation
@@ -27,6 +30,9 @@ class Visualisation:
         self._render_pedestrian_info = cell_size > 20
         self._render_heatmap_info = cell_size > 30
         self._render_pedestrian_target_line = cell_size > 30
+        self._current_color_angle: int = 0
+        self._spawner_colors = {spawner: self._get_random_color() for spawner in simulation.get_spawners()}
+        self._target_colors = {target: self._get_random_color() for target in simulation.get_targets()}
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -42,6 +48,13 @@ class Visualisation:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_s:
                     self._include_social_distancing = not self._include_social_distancing
+
+    def _get_random_color(self) -> (int, int, int):
+        angle = self._current_color_angle
+        self._current_color_angle += 23
+        color = Color(0)
+        color.hsla = angle, 100, 50, 100
+        return color.r, color.g, color.b
 
     def _mix_colors(self, color1, color2, ratio):
         return tuple(int(c1 * ratio + c2 * (1 - ratio)) for c1, c2 in zip(color1, color2))
@@ -108,14 +121,15 @@ class Visualisation:
             if pedestrian.has_targeted_cell():
                 target = pedestrian.get_targeted_cell()
                 if self._render_pedestrian_target_line:
-                    pygame.draw.line(self.screen, (0, 0, 255), self._get_center_pos(pedestrian), self._get_center_pos(target), 2)
+                    pygame.draw.line(self.screen, self._target_colors[pedestrian.get_target()], self._get_center_pos(pedestrian), self._get_center_pos(target), 2)
 
                 angle = math.atan2(target.get_y() - pedestrian.get_y(), target.get_x() - pedestrian.get_x())
                 triangle = self._get_small_triangle(pedestrian, angle)
-                pygame.draw.polygon(self.screen, (0, 0, 255), triangle)
+                pygame.draw.polygon(self.screen, self._spawner_colors[pedestrian.get_spawner()], triangle)
+                pygame.draw.lines(self.screen, self._target_colors[pedestrian.get_target()], True, triangle, 2)
             else:
                 rect = self._get_small_rect(pedestrian)
-                pygame.draw.rect(self.screen, (0, 0, 255), rect)
+                pygame.draw.rect(self.screen, self._spawner_colors[pedestrian.get_spawner()], rect)
 
             if self._render_pedestrian_info:
                 speed_info = font.render(f"[{pedestrian.get_id()}] {pedestrian.get_average_speed():.2f}m/s, {pedestrian.get_optimal_speed():.2f}m/s", True, (0, 0, 0))
@@ -144,19 +158,18 @@ class Visualisation:
             name = font.render(spawner.get_name(), True, (0, 0, 0))
             for cell in spawner.get_cells():
                 cell_rect = self._get_small_rect(cell)
-                pygame.draw.rect(self.screen, (0, 255, 0), cell_rect)
+                pygame.draw.rect(self.screen, self._spawner_colors[spawner], cell_rect)
                 if self._render_static_names:
                     text_pos = self._get_x_center_pos(cell, name.get_height())
                     self.screen.blit(name, name.get_rect(center=text_pos))
 
     def render_targets(self):
-        half_size = self.cell_size // 2
+        radius = self.cell_size // 4
         font = pygame.font.Font(None, 20)
         for target in self.simulation.get_targets():
             name = font.render(target.get_name(), True, (0, 0, 0))
             for cell in target.get_cells():
-                cell_rect = self._get_small_rect(cell)
-                pygame.draw.rect(self.screen, (255, 0, 0), cell_rect)
+                pygame.draw.circle(self.screen, self._target_colors[target], self._get_center_pos(cell), radius)
                 if self._render_static_names:
                     text_pos = self._get_x_center_pos(cell, name.get_height())
                     self.screen.blit(name, name.get_rect(center=text_pos))
