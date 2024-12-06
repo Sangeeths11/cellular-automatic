@@ -1,3 +1,4 @@
+from simulation.core.cell_state import CellState
 from simulation.core.simulation import Simulation
 from simulation.core.simulation_grid import SimulationGrid
 from simulation.core.spawner import Spawner
@@ -12,17 +13,18 @@ from visualisation.visualisation import Visualisation
 
 def main():
     grid = SimulationGrid(10, 10, MooreNeighbourhood)
-    obstacles_walls = [(2,0), (2,1), (2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (2, 7), (5, 9), (5,8), (5,7), (5,6), (5,5), (5,4), (5,3)]
-    obstacles_center = [(4,3),(5,3),(4,5),(5,4),(5,5)]
+    obstacles_walls = [(2, 0), (2, 1), (2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (2, 7), (5, 9), (5, 8), (5, 7), (5, 6),
+                       (5, 5), (5, 4), (5, 3)]
+    obstacles_center = [(4, 3), (5, 3), (4, 5), (5, 4), (5, 5)]
 
     for (x, y) in obstacles_walls:
         grid.get_cell(x, y).set_osbtacle()
 
     distancing = EuclideanDistance()
     dijkstra = DijkstraHeatmapGenerator(distancing)
-    fast_marching = FastMarchingHeatmapGenerator(distancing)
+    fast_marching = FastMarchingHeatmapGenerator(distancing, 1.0, {CellState.OBSTACLE})
 
-    target_cells = [grid.get_cell(x, y) for (x, y) in [(9,9),  (9,8), (9,7)]]
+    target_cells = [grid.get_cell(x, y) for (x, y) in [(9, 9), (9, 8), (9, 7)]]
     target = Target("Target", target_cells, grid, fast_marching)
     target2 = Target("Target2", [grid.get_cell(0, 9), grid.get_cell(1, 9)], grid, fast_marching)
 
@@ -37,6 +39,7 @@ def main():
     sim = Simulation(0.1, grid, distancing, social_distancing, [target], [spawner])
     vis = Visualisation(sim)
     vis.run()
+
 
 if __name__ == "__main__":
     main()

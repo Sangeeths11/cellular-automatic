@@ -8,9 +8,20 @@ from simulation.heatmaps.heatmap import Heatmap
 
 
 class HeatmapGeneratorBase(ABC):
+    """
+    Base class for heatmap generators. Heatmap generators generate heatmaps based on the given target and grid
+    """
+
     def __init__(self):
         pass
 
+
     @abstractmethod
     def generate_heatmap(self, target: Iterable[Cell], grid: SimulationGrid) -> Heatmap:
+        """
+        Generates heatmap based on the given target and grid
+        :param target: target cells off the heatmap
+        :param grid: the simulation grid the heatmap should be generated for
+        :return: a heatmap where each cell is assigned a distance to the closest target cell
+        """
         pass

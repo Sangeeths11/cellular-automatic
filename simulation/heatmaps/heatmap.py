@@ -5,8 +5,14 @@ from simulation.core.position import Position
 
 
 class Heatmap(GridBase[float]):
-    INFINITY = float("inf")
+    """
+    Heatmap represents a special grid of float values, it's main usage is for building 2D navigation maps
+    width: int - width of the heatmap
+    height: int - height of the heatmap
+    initial_value: float - initial value for each cell, default is INFINITY
+    """
 
+    INFINITY = float("inf")
     def __init__(self, width: int, height: int, initial_value: float = INFINITY):
         self._initial_value = initial_value
         super().__init__(width, height)

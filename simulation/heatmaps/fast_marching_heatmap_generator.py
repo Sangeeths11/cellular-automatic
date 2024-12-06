@@ -13,13 +13,23 @@ from simulation.heatmaps.pathfinding_queue import PathfindingQueue
 from simulation.neighbourhood.base_neighbourhood import NeighbourhoodBase
 from simulation.neighbourhood.neumann_neighbourhood import NeumannNeighbourhood
 
-
 class FastMarchingHeatmapGenerator(HeatmapGeneratorBase):
-    def __init__(self, distancing: DistanceBase, phi: float = 1.0):
+    """
+    Heatmap generator using the Fast Marching Method
+    """
+    def __init__(self, distancing: DistanceBase, delta_x: float = 1.0, blocked=None):
+        """
+        :param distancing: algorithm for calculating distance between cells
+        :param delta_x: distance between cells
+        :param blocked: set of CellStates that are considered blocked, default is {CellState.OBSTACLE}
+        """
         super().__init__()
+        if blocked is None:
+            blocked = {CellState.OBSTACLE}
         self._narrowband = NeumannNeighbourhood(1, 1)
         self._distancing = distancing
-        self._phi = phi
+        self._delta_x = delta_x
+        self._blocked = blocked if blocked is not None else {CellState.OBSTACLE}
 
     def _get_narrow_band(self, cell: Cell, grid: SimulationGrid) -> Generator[Cell]:
         for x, y in self._narrowband.get_neighbours(cell.get_x(), cell.get_y(), 1, 1):
@@ -46,13 +56,13 @@ class FastMarchingHeatmapGenerator(HeatmapGeneratorBase):
         elif len(fixed_neighbours) == 2:
             a = heatmap.get_cell_at_pos(fixed_neighbours[0])
             b = heatmap.get_cell_at_pos(fixed_neighbours[1])
-            return min(a, b) + 1 if abs(a-b) > 1 else (a + b + math.sqrt(2 - ((a - b) ** 2))) / 2
+            return (a + b + math.sqrt(2 * self._delta_x**2 - ((a - b) ** 2))) / 2
         elif len(fixed_neighbours) == 3:
             single = fixed_neighbours[0] if self._are_opposite(fixed_neighbours[1], fixed_neighbours[2]) else fixed_neighbours[1] if self._are_opposite(fixed_neighbours[0], fixed_neighbours[2]) else fixed_neighbours[2]
             others = [heatmap.get_cell_at_pos(neighbour) for neighbour in fixed_neighbours if neighbour != single]
             a = heatmap.get_cell_at_pos(single)
             b = min(others[0], others[1])
-            return min(a, b) + 1 if abs(a-b) > 1 else (a + b + math.sqrt(2 - ((a - b) ** 2))) / 2
+            return (a + b + math.sqrt(2 * self._delta_x**2 - ((a - b) ** 2))) / 2
 
 
 
@@ -76,7 +86,7 @@ class FastMarchingHeatmapGenerator(HeatmapGeneratorBase):
                 if neighbour in fixed:
                     continue
 
-                if neighbour.get_state() == CellState.OBSTACLE:
+                if  neighbour.get_state() in self._blocked:
                     heatmap.set_cell(neighbour.get_x(), neighbour.get_y(), Heatmap.INFINITY)
                     visited.mark_visited(neighbour)
                 else:

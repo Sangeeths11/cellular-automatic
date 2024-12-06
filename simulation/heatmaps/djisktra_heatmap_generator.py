@@ -12,9 +12,18 @@ from simulation.heatmaps.pathfinding_queue import PathfindingQueue
 
 
 class DijkstraHeatmapGenerator(HeatmapGeneratorBase):
-    def __init__(self, distancing: DistanceBase):
+    """
+    Heatmap generator using the Dijkstra algorithm
+    """
+    def __init__(self, distancing: DistanceBase, blocked: set[CellState] = None):
+        """
+        :param distancing: algorithm for calculating distance between cells
+        :param blocked:  set of CellStates that are considered blocked, default is {CellState.OBSTACLE}
+        """
         super().__init__()
         self._distancing = distancing
+        self._blocked = blocked if blocked is not None else {CellState.OBSTACLE}
+
 
     def generate_heatmap(self, target: Iterable[Cell], grid: SimulationGrid) -> Heatmap:
         heatmap = Heatmap(grid.get_width(), grid.get_height())
@@ -25,7 +34,7 @@ class DijkstraHeatmapGenerator(HeatmapGeneratorBase):
             visited.push(cell, 0)
 
         for cell in grid.get_cells():
-            if cell.get_state() == CellState.OBSTACLE: # can't enter cells which aren't free
+            if cell.get_state() == CellState.OBSTACLE:  # can't enter cells which aren't free
                 heatmap.set_cell(cell.get_x(), cell.get_y(), Heatmap.INFINITY)
                 visited.mark_visited(cell)
 

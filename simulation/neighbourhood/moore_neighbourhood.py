@@ -4,6 +4,9 @@ from simulation.neighbourhood.base_neighbourhood import NeighbourhoodBase
 
 
 class MooreNeighbourhood(NeighbourhoodBase):
+    """
+    MooreNeighbourhood represents a neighbourhood which returns all neighbours in a rectangle defined by width and height around the given cell
+    """
     def __init__(self, width: int, height: int):
         super().__init__(width, height)
 
