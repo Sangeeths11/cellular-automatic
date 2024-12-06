@@ -1,4 +1,5 @@
 from simulation.core.cell import Cell
+from simulation.core.position import Position
 from simulation.core.spawner import Spawner
 from simulation.core.target import Target
 from simulation.heatmaps.distancing.base_distance import DistanceBase
@@ -19,6 +20,7 @@ class Simulation:
         self._spawners: list[Spawner] = spawners
         self._social_distancing_generator: SocialDistancingHeatmapGenerator = social_distancing
         self._distancing_heatmap: Heatmap = None
+        self._distancing = distancing
         self._steps: int = 0
         self._run_time: float = 0
         self._time_resolution: float = time_resolution
@@ -31,6 +33,12 @@ class Simulation:
 
     def get_grid(self) -> SimulationGrid:
         return self._grid
+
+    def get_max_grid_distance(self):
+        max_point = Position(self.get_grid().get_width(), self.get_grid().get_height())
+        min_point = Position(0, 0)
+        return self._distancing.calculate_distance(min_point, max_point)
+
 
     def get_distancing_heatmap(self) -> Heatmap:
         return self._distancing_heatmap
@@ -97,7 +105,9 @@ class Simulation:
 
             # TODO: move lambda to separate function
             # TODO: instead of ignoring occupied cells, try to add a penalty to them
-            for cell in sorted(neighbours, key=lambda n: heatmap.get_cell_at_pos(n) + self._distancing_heatmap.get_cell_at_pos(n) - self._social_distancing_generator.get_bias(pedestrian, n)):
+            for cell in sorted(neighbours, key=lambda n: heatmap.get_cell_at_pos(n) +
+                                                         self._distancing_heatmap.get_cell_at_pos(n) -
+                                                         self._social_distancing_generator.get_bias(pedestrian, n)):
                 if cell.is_free():
                     return cell
 
@@ -115,4 +125,5 @@ class Simulation:
             elif pedestrian.has_target() is False:
                 new_target_cell = self._get_pedestrian_target_cell(pedestrian)
                 pedestrian.set_target_cell(new_target_cell)
+
 

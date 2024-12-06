@@ -19,10 +19,12 @@ class Visualisation:
         self.clock = pygame.time.Clock()
         self.running = True
         self._fps = fps
-        self._max_heatmap_value = simulation._social_distancing_generator.get_max_value() + math.sqrt(
-            simulation.get_grid().get_width() ** 2 + simulation.get_grid().get_height() ** 2)
+        self._max_heatmap_value = simulation._social_distancing_generator.get_max_value() + simulation.get_max_grid_distance()
         self._selected_target = None # simulation.get_targets()[0]
         self._include_social_distancing = True
+        self._render_static_names = cell_size > 40
+        self._render_pedestrian_info = cell_size > 20
+        self._render_heatmap_info = cell_size > 30
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -81,9 +83,10 @@ class Visualisation:
         for pedestrian in self.simulation.get_pedestrians():
             rect = self._get_small_rect(pedestrian)
             pygame.draw.rect(self.screen, (0, 0, 255), rect)
-            speed_info = font.render(f"[{pedestrian.get_id()}] {pedestrian.get_average_speed():.2f}m/s, {pedestrian.get_optimal_speed():.2f}m/s", True, (0, 0, 0))
-            text_pos = self._get_x_center_pos(pedestrian, speed_info.get_height())
-            self.screen.blit(speed_info, speed_info.get_rect(center=text_pos))
+            if self._render_pedestrian_info:
+                speed_info = font.render(f"[{pedestrian.get_id()}] {pedestrian.get_average_speed():.2f}m/s, {pedestrian.get_optimal_speed():.2f}m/s", True, (0, 0, 0))
+                text_pos = self._get_x_center_pos(pedestrian, speed_info.get_height())
+                self.screen.blit(speed_info, speed_info.get_rect(center=text_pos))
 
 
     def render_info(self):
@@ -108,8 +111,9 @@ class Visualisation:
             for cell in spawner.get_cells():
                 cell_rect = self._get_small_rect(cell)
                 pygame.draw.rect(self.screen, (0, 255, 0), cell_rect)
-                text_pos = self._get_x_center_pos(cell, name.get_height())
-                self.screen.blit(name, name.get_rect(center=text_pos))
+                if self._render_static_names:
+                    text_pos = self._get_x_center_pos(cell, name.get_height())
+                    self.screen.blit(name, name.get_rect(center=text_pos))
 
     def render_targets(self):
         half_size = self.cell_size // 2
@@ -119,8 +123,9 @@ class Visualisation:
             for cell in target.get_cells():
                 cell_rect = self._get_small_rect(cell)
                 pygame.draw.rect(self.screen, (255, 0, 0), cell_rect)
-                text_pos = self._get_x_center_pos(cell, name.get_height())
-                self.screen.blit(name, name.get_rect(center=text_pos))
+                if self._render_static_names:
+                    text_pos = self._get_x_center_pos(cell, name.get_height())
+                    self.screen.blit(name, name.get_rect(center=text_pos))
 
     def render_heatmap(self):
         heatmap = self._selected_target.get_heatmap() if self._selected_target is not None else None
@@ -138,9 +143,10 @@ class Visualisation:
                 color = self._mix_colors((255, 200, 0), (0, 100, 255), ratio)
                 rect = self._get_rect_at(x, y)
                 pygame.draw.rect(self.screen, color, rect)
-                value_text = font.render(f"{value:.2f}", True, (40, 40, 40))
-                text_pos = self._get_center_pos_at(x, y)
-                self.screen.blit(value_text, value_text.get_rect(center=text_pos))
+                if self._render_heatmap_info:
+                    value_text = font.render(f"{value:.2f}", True, (40, 40, 40))
+                    text_pos = self._get_center_pos_at(x, y)
+                    self.screen.blit(value_text, value_text.get_rect(center=text_pos))
 
     def update(self, delta):
         if self.simulation.is_done() is False:

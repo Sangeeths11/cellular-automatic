@@ -11,6 +11,22 @@ from simulation.neighbourhood.moore_neighbourhood import MooreNeighbourhood
 from visualisation.visualisation import Visualisation
 
 
+def test_large():
+    grid = SimulationGrid(100, 100, MooreNeighbourhood)
+    for i in range(0, 90):
+        grid.get_cell(49, i).set_osbtacle()
+        grid.get_cell(50, i).set_osbtacle()
+        grid.get_cell(51, i).set_osbtacle()
+
+    distancing = EuclideanDistance(0.1)
+    dijkstra = DijkstraHeatmapGenerator(distancing)
+    target = Target("Target", [grid.get_cell(99, 0), grid.get_cell(99, 1), grid.get_cell(99, 2)], grid, dijkstra)
+    spawner = Spawner("Spawner", distancing, [grid.get_cell(0, 0), grid.get_cell(0, 1), grid.get_cell(0, 2),], [target], 10, 1, 2, 0)
+    social_distancing = SocialDistancingHeatmapGenerator(distancing, 3, 3)
+    sim = Simulation(0.1, grid, distancing, social_distancing, [target], [spawner])
+    visualisation = Visualisation(sim, 10, 30)
+    visualisation.run()
+
 def main():
     grid = SimulationGrid(10, 10, MooreNeighbourhood)
     obstacles_walls = [(2, 0), (2, 1), (2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (2, 7), (5, 9), (5, 8), (5, 7), (5, 6),
