@@ -8,14 +8,20 @@ from simulationConfig.config_loader import SimulationConfigLoader
 
 
 def main():
-    simulation_config = SimulationConfigLoader.load_config("simulationConfig\\simulation_config.json")
+    simulation_config = SimulationConfigLoader.load_config("simulationConfig\\chicken_test.json")
 
     neighbourhood_class = SimulationConfigLoader.get_neighbourhood_class(simulation_config["grid"]["neighbourhood"])
     grid = SimulationGrid(simulation_config["grid"]["width"], simulation_config["grid"]["height"], neighbourhood_class)
     
     for obstacle in simulation_config["obstacles"]:
-        for (x, y) in obstacle["cells"]:
-            grid.get_cell(x, y).set_osbtacle() 
+        if "cells" in obstacle:
+            for (x, y) in obstacle["cells"]:
+                grid.get_cell(x, y).set_osbtacle()
+        elif "rect" in obstacle:
+            x1, y1, x2, y2 = obstacle["rect"]
+            for x in range(x1, x2+1):
+                for y in range(y1, y2+1):
+                    grid.get_cell(x, y).set_osbtacle()
 
     distance_class = SimulationConfigLoader.get_distance_class(simulation_config["distancing"]["type"])
     distancing = distance_class(simulation_config["distancing"]["scale"])
@@ -55,6 +61,7 @@ def main():
         simulation_config["simulation"].get("occupation_bias_modifier", 1.0),
         simulation_config["simulation"].get("retargeting_threshold", -1.0)
     )
+
     vis = Visualisation(sim)
     vis.run()
 

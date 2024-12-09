@@ -37,7 +37,7 @@ class SocialDistancingHeatmapGenerator(HeatmapGeneratorBase):
         return self._calculate_value(self._distancing.calculate_distance(center, neighbour))
 
     def get_max_value(self):
-        return self._calculate_value(self._width - 0.01)
+        return 8 * self._calculate_value(self._distancing.get_scale())
 
     def _calculate_value(self, distance: float):
         if abs(distance) < self._width:

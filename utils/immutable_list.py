@@ -16,3 +16,9 @@ class ImmutableList[T]:
 
     def __iter__(self):
         return iter(self._data)
+
+    def __contains__(self, item):
+        return item in self._data
+
+    def index(self, target):
+        return self._data.index(target)

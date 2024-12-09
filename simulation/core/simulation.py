@@ -13,7 +13,9 @@ from utils.immutable_list import ImmutableList
 
 
 class Simulation:
-    def __init__(self, time_resolution: float, grid: SimulationGrid, distancing: DistanceBase, social_distancing: SocialDistancingHeatmapGenerator, targets: list[Target], spawners: list[Spawner], occupation_bias_modifier: float|None = 1.0, retargeting_threshold: float|None = -1.0):
+    def __init__(self, time_resolution: float, grid: SimulationGrid, distancing: DistanceBase,
+                 social_distancing: SocialDistancingHeatmapGenerator, targets: list[Target], spawners: list[Spawner],
+                 occupation_bias_modifier: float | None = 1.0, retargeting_threshold: float | None = -1.0):
         self._pedestrians: list[Pedestrian] = list()
         self._grid: SimulationGrid = grid
         self._targets: list[Target] = targets
@@ -24,8 +26,8 @@ class Simulation:
         self._steps: int = 0
         self._run_time: float = 0
         self._time_resolution: float = time_resolution
-        self._occupation_bias_modifier: float|None = occupation_bias_modifier
-        self._retargeting_threshold: float|None = retargeting_threshold
+        self._occupation_bias_modifier: float | None = occupation_bias_modifier
+        self._retargeting_threshold: float | None = retargeting_threshold
 
     def get_spawners(self) -> ImmutableList[Spawner]:
         return ImmutableList(self._spawners)
@@ -41,11 +43,10 @@ class Simulation:
         min_point = Position(0, 0)
         return self._distancing.calculate_distance(min_point, max_point)
 
-
     def get_distancing_heatmap(self) -> Heatmap:
         return self._distancing_heatmap
 
-    def get_target_at(self, x: int, y: int) -> Target | None:
+    def get_target(self, x: int, y: int) -> Target | None:
         for target in self._targets:
             if target.is_coordinate_inside_target(x, y):
                 return target
@@ -76,6 +77,7 @@ class Simulation:
         self._pedestrians.remove(pedestrian)
         cell = self._grid.get_cell_at_pos(pedestrian)
         cell.remove_pedestrian()
+        pedestrian.set_reached_target()
 
     def _add_pedestrian(self, pedestrian: Pedestrian):
         cell = self._grid.get_cell_at_pos(pedestrian)
@@ -96,31 +98,33 @@ class Simulation:
         for target in self._targets:
             target.update_heatmap()
 
-    def _get_cell_value(self, pedestrian: Pedestrian, cell: Cell, heatmap: Heatmap) -> float:
+    def _get_cell_value(self, pos: Position, cell: Cell, heatmap: Heatmap) -> float:
         value = heatmap.get_cell_at_pos(cell)
         value += self._distancing_heatmap.get_cell_at_pos(cell)
-        value -= self._social_distancing_generator.get_bias(pedestrian, cell)
+        value -= self._social_distancing_generator.get_bias(pos, cell)
         if self._occupation_bias_modifier is not None:
             value += (self._occupation_bias_modifier * cell.get_pedestrian().get_occupation_bias()) if cell.is_occupied() else 0
 
         return value
 
-    def _get_pedestrian_target_cell(self, pedestrian: Pedestrian) -> Cell | None:
+    def _get_next_target_cell(self, heatmap: Heatmap, pos: Position) -> Cell | None:
+        neighbours = self._grid.get_neighbours_at(pos)
+
+        # TODO: move lambda to separate function
+        # TODO: instead of ignoring occupied cells, try to add a penalty to them
+        for cell in sorted(neighbours, key=lambda n: self._get_cell_value(pos, n, heatmap)):
+            if self._occupation_bias_modifier is not None or cell.is_free():
+                return cell
+
+        return None
+
+    def _get_next_pedestrian_target(self, pedestrian: Pedestrian) -> Cell | None:
         if pedestrian.is_inside_target():
-            pedestrian.get_target().increment_exit_count()
             self._remove_pedestrian(pedestrian)
             return None
         else:
-            heatmap = pedestrian.get_heatmap()
-            neighbours = self._grid.get_neighbours_at(pedestrian)
+            return self._get_next_target_cell(pedestrian.get_target().get_heatmap(), pedestrian)
 
-            # TODO: move lambda to separate function
-            # TODO: instead of ignoring occupied cells, try to add a penalty to them
-            for cell in sorted(neighbours, key=lambda n: self._get_cell_value(pedestrian, n, heatmap)):
-                if self._occupation_bias_modifier is not None or cell.is_free():
-                    return cell
-
-            return None
 
     def _update_pedestrians(self, delta: float):
         for pedestrian in sorted(self._pedestrians, key=lambda p: p.get_current_distance()):
@@ -129,16 +133,15 @@ class Simulation:
                 cell = self._grid.get_cell_at_pos(pedestrian)
                 cell.remove_pedestrian()
                 pedestrian.move()
-                new_target_cell = self._get_pedestrian_target_cell(pedestrian)
+                pedestrian.get_targeted_cell().set_pedestrian(pedestrian)
+                new_target_cell = self._get_next_pedestrian_target(pedestrian)
                 pedestrian.set_target_cell(new_target_cell)
+
             elif pedestrian.has_targeted_cell() is False:
-                new_target_cell = self._get_pedestrian_target_cell(pedestrian)
+                new_target_cell = self._get_next_pedestrian_target(pedestrian)
                 pedestrian.set_target_cell(new_target_cell)
 
                 # if the target cell is occupied, try to find a new target cell to avoid deadlocks
             elif pedestrian.get_targeted_cell().is_occupied() and self._retargeting_threshold is not None and self._retargeting_threshold > pedestrian.get_current_distance():
-                new_target_cell = self._get_pedestrian_target_cell(pedestrian)
+                new_target_cell = self._get_next_pedestrian_target(pedestrian)
                 pedestrian.set_target_cell(new_target_cell)
-
-
-

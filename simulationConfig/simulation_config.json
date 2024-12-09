@@ -16,14 +16,8 @@
   ],
   "targets": [
     {
-      "name": "Target2",
-      "cells": [[9, 9], [9, 8], [9, 7]],
-      "heatmap_generator": "FastMarchingHeatmapGenerator",
-      "cellstate": ["OBSTACLE"]
-    },
-    {
       "name": "Target",
-      "cells": [[0, 9], [0, 8], [0, 7]],
+      "cells": [[9, 9], [9, 8], [9, 7]],
       "heatmap_generator": "FastMarchingHeatmapGenerator",
       "cellstate": ["OBSTACLE"]
     }
@@ -34,17 +28,8 @@
       "cells": [[0, 0], [0, 1], [1, 0], [1, 1]],
       "targets": ["Target"],
       "total_spawns": 20,
-      "batch_size": 2,
-      "spawn_delay": 1.0,
-      "initial_delay": 0.0
-    },
-    {
-      "name": "Spawner2",
-      "cells": [[9, 0], [8, 0], [9, 1], [8, 1]],
-      "targets": ["Target2"],
-      "total_spawns": 20,
-      "batch_size": 2,
-      "spawn_delay": 1.0,
+      "batch_size": 1,
+      "spawn_delay": 4,
       "initial_delay": 0.0
     }
   ],

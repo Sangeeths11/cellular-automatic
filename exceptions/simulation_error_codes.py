@@ -15,5 +15,5 @@ class SimulationErrorCode(ErrorCodeDataMixin, Enum):
     CELL_NOT_OCCUPIED = 8, "Tried to unoccupy a cell that is not occupied"
     VALUE_NOT_INITIALIZED = 9, "The value has not been initialized yet, this mostly occurs when the first simulation step has not been executed"
     ALREADY_IN_CELL = 10, "The pedestrian is already in the cell and can't target it"
-    CANNOT_MOVE = 11, "Move was called but the pedestrian can't move"
+    CANNOT_MOVE = 11, "Move was called but the pedestrian can't move or has already reached it's target"
     NO_FIXED_NEIGHBOURS = 12, "No fixed neighbours found for fast marching algorithm"

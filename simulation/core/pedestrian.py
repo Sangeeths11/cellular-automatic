@@ -35,6 +35,13 @@ class Pedestrian(Position):
         self._time_alive: float = 0
         self._total_distance_moved: float = 0
         self._refund_distance_flag = False
+        self._reached_target = False
+
+    def set_reached_target(self) -> None:
+        self._reached_target = True
+
+    def has_reached_target(self) -> bool:
+        return self._reached_target
 
     def set_target_cell(self, target_cell: 'Cell') -> None:
         if target_cell is None:
@@ -66,13 +73,14 @@ class Pedestrian(Position):
         return self._target_cell
 
     def can_move(self) -> bool:
-        return self._current_distance < 0 and self.has_targeted_cell() and self._target_cell.is_free()
+        return self._current_distance < 0 and self.has_targeted_cell() and self._target_cell.is_free() and not self.has_reached_target()
 
     def move(self) -> None:
-        if not self.can_move():
+        if not self.can_move() or self.has_reached_target():
             raise SimulationError(SimulationErrorCode.CANNOT_MOVE)
 
-        self._target_cell.set_pedestrian(self)
+        # pedestrians shouldn't manipulate the themselves
+        # self._target_cell.set_pedestrian(self)
         self._x = self._target_cell.get_x()
         self._y = self._target_cell.get_y()
         self._total_distance_moved += self._distance_to_target
