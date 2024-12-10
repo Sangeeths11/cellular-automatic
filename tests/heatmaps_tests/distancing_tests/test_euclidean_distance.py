@@ -14,7 +14,7 @@ class TestEuclideanDistance(unittest.TestCase):
 
     def test_calculate_distance(self):
         """Tests the calculate_distance method."""
-        expected_distance = 5.0 * 2.0  # Euclidean distance (3, 4) scaled by 2.0
+        expected_distance = 5.0 * 2.0
         self.assertEqual(self.distance.calculate_distance(self.pos1, self.pos2), expected_distance)
 
 if __name__ == '__main__':
