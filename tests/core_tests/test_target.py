@@ -61,7 +61,7 @@ class TestTarget(unittest.TestCase):
         for cell, pos in zip(self.cells, positions):
             cell.get_x.return_value = pos.get_x()
             cell.get_y.return_value = pos.get_y()
-            cell.get_position.return_value = pos
+            cell.as_tuple.return_value = (pos.get_x(), pos.get_y())
 
         position_inside = positions[0]
         position_outside = Position(4, 4)
