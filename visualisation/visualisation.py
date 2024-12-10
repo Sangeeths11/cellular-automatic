@@ -48,7 +48,7 @@ class Visualisation:
         self._helper = VisualisationHelper(self)
         self._shortcuts: dict[int, Shortcut] = {}
         self._features: list[VisualisationFeatureBase] = []
-        self._font = pygame.font.SysFont("Arial", 20)
+        self._font = pygame.font.SysFont("Arial", int(self._cell_size * 0.75))
         self._buttons: list[Button] = []
         self._click_theme = DEFAULT_THEME
         self._on_theme = Theme.create_theme((100, 250, 30))

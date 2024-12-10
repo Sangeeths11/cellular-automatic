@@ -4,11 +4,11 @@ from simulation.core.spawner import Spawner
 from simulation.core.target import Target
 from simulation.heatmaps.social_distancing_heatmap_generator import SocialDistancingHeatmapGenerator
 from visualisation.visualisation import Visualisation
-from simulationConfig.config_loader import SimulationConfigLoader
+from simulation_config.config_loader import SimulationConfigLoader
 
 
 def main():
-    simulation_config = SimulationConfigLoader.load_config("simulationConfig\\chicken_test.json")
+    simulation_config = SimulationConfigLoader.load_config("simulation_config\\chicken_test.json")
 
     neighbourhood_class = SimulationConfigLoader.get_neighbourhood_class(simulation_config["grid"]["neighbourhood"])
     grid = SimulationGrid(simulation_config["grid"]["width"], simulation_config["grid"]["height"], neighbourhood_class)

@@ -39,10 +39,11 @@ class GridBase[T](ABC):
     def is_in_bounds(self, x: int, y: int) -> bool:
         return 0 <= x < self._width and 0 <= y < self._height
 
-    """
-    Raises a SimulationError if the given coordinates are out of bounds.
-    """
+
     def check_bounds(self, x: int, y: int) -> None:
+        """
+        Raises a SimulationError if the given coordinates are out of bounds.
+        """
         if not self.is_in_bounds(x, y):
             raise SimulationError(SimulationErrorCode.INVALID_COORDINATES, {"x": x, "y": y})
 
