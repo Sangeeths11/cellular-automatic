@@ -115,6 +115,7 @@ class Visualisation:
         self.add_shortcut(Shortcut("Toggle grid lines", pygame.K_l, 0, grid.set_show_lines, True, grid.get_show_lines()), True, "Grid lines\n{0}")
         self.add_shortcut(Shortcut("Show object names", pygame.K_n, 0, self._set_show_names, True, False), True, "Show names\n{0}")
         self.add_shortcut(Shortcut("Show pedestrian details", pygame.K_p, pygame.KMOD_LSHIFT, pedestrian.set_render_details, True, pedestrian.get_render_details()), True, "Pedestrian details\n{0}")
+        self.add_shortcut(Shortcut("Show pedestrian target cell", pygame.K_p, pygame.KMOD_LCTRL, pedestrian.set_render_target_line, True, pedestrian.get_render_target_line()), True, "Pedestrian target\n{0}")
         self.add_shortcut(Shortcut("Pause", pygame.K_SPACE, 0, self.set_pause, True, self.is_paused()), True, "Unpause", "Pause")
         self.add_shortcut(Shortcut("Next target", pygame.K_RIGHT, 0, heatmap.next_target, False), True, "Next target\nheatmap")
         self.add_shortcut(Shortcut("Previous target", pygame.K_LEFT, 0, heatmap.previous_target, False), True, "Previous target\nheatmap")

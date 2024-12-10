@@ -24,9 +24,9 @@ class TestPosition(unittest.TestCase):
 
     def test_equals_method(self):
         """Tests the equals method."""
-        self.assertTrue(self.position.equals(self.same_position))
-        self.assertFalse(self.position.equals(self.different_position))
-        self.assertFalse(self.position.equals((1, 2)))
+        self.assertTrue(self.position.pos_equals(self.same_position))
+        self.assertFalse(self.position.pos_equals(self.different_position))
+        self.assertFalse(self.position.pos_equals((1, 2)))
 
     def test_hash(self):
         """Tests the __hash__ method."""

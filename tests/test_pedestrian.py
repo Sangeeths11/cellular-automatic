@@ -18,11 +18,9 @@ class TestPedestrian(unittest.TestCase):
         self.target = Mock(spec=Target)
         self.target.is_inside_target.return_value = False
 
-        self.cell = Mock(spec=Cell)
-        self.cell.get_x.return_value = 1
-        self.cell.get_y.return_value = 2
+        self.real_cell = Cell(1, 2)
+        self.cell = Mock(spec=Cell, wraps=self.real_cell)
         self.cell.is_free.return_value = True
-        self.cell.get_position.return_value = Position(1, 2)
 
         self.pedestrian = Pedestrian(
             x=0,
@@ -60,9 +58,9 @@ class TestPedestrian(unittest.TestCase):
 
     def test_set_target_cell_already_in_cell(self):
         """Tests that an exception is raised when the target cell is the current position."""
-        self.cell.get_position.return_value = Position(0, 0)
+        cell = Cell(0, 0)
         with self.assertRaises(SimulationError) as context:
-            self.pedestrian.set_target_cell(self.cell)
+            self.pedestrian.set_target_cell(cell)
         self.assertEqual(context.exception.get_code(), SimulationErrorCode.ALREADY_IN_CELL.value[0])
 
     def test_can_move_true(self):

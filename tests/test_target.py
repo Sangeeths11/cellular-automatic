@@ -59,6 +59,8 @@ class TestTarget(unittest.TestCase):
         """Tests the is_inside_target method."""
         positions = [Position(x, y) for x, y in [(1, 1), (2, 2), (3, 3)]]
         for cell, pos in zip(self.cells, positions):
+            cell.get_x.return_value = pos.get_x()
+            cell.get_y.return_value = pos.get_y()
             cell.get_position.return_value = pos
 
         position_inside = positions[0]

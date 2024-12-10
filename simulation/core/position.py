@@ -15,8 +15,8 @@ class Position(ABC):
     def get_position(self) -> tuple[int, int]:
         return self._x, self._y
 
-    def equals(self, other: object) -> bool:
-        return isinstance(other, Position) and self._x == other.get_x() and self._y == other.get_y()
+    def pos_equals(self, other: object) -> bool:
+        return isinstance(other, Position) and self.get_x() == other.get_x() and self.get_y() == other.get_y()
 
     def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)

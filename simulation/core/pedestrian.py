@@ -48,7 +48,7 @@ class Pedestrian(Position):
             self._target_cell = None
             self._current_distance = Pedestrian.NEGATIVE_INFINITY
         else:
-            if target_cell.get_position() == self.get_position():
+            if target_cell.pos_equals(self):
                 raise SimulationError(SimulationErrorCode.ALREADY_IN_CELL, {"cell": target_cell})
 
             if self._refund_distance_flag and self._current_distance is not Pedestrian.NEGATIVE_INFINITY and self._current_distance is not Pedestrian.INFINITY:

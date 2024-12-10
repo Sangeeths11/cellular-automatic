@@ -25,7 +25,7 @@ class TestSpawner(unittest.TestCase):
     def test_initialization(self):
         """Test spawner initialization."""
         self.assertEqual(self.spawner.get_name(), "TestSpawner")
-        self.assertEqual(self.spawner.get_cells(), ImmutableList(self.cells))
+        self.assertEqual(self.spawner.get_cells()._data, self.cells)
         self.assertEqual(self.spawner._total_spawns, 10)
         self.assertEqual(self.spawner._batch_size, 2)
         self.assertEqual(self.spawner._spawn_delay, 1.0)
@@ -79,7 +79,8 @@ class TestSpawner(unittest.TestCase):
         pedestrians = list(self.spawner.update(0.4))
         mock_spawn.assert_not_called()
         self.assertEqual(pedestrians, [])
-        self.assertEqual(self.spawner._current_delay, 0.1)
+        # compare with .5 - .4 = because of floating point error (0.0999999999999998)
+        self.assertEqual(self.spawner._current_delay, 0.5 - 0.4)
 
     @patch.object(Spawner, 'spawn')
     def test_update_no_spawn_due_to_total_spawns(self, mock_spawn):

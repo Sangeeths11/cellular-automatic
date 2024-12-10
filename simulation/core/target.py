@@ -51,7 +51,7 @@ class Target:
 
     def is_inside_target(self, pos: Position) -> bool:
         for cell in self._cells:
-            if pos.equals(cell):
+            if pos.pos_equals(cell):
                 return True
 
         return False
