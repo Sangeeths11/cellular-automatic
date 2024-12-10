@@ -21,3 +21,18 @@ class Shortcut:
             self.action(self._state)
         else:
             self.action()
+
+    def is_toggle(self):
+        return self._is_toggle
+
+    def get_state(self):
+        return self._state
+
+    def get_action(self):
+        return self.action
+
+    def set_action(self, action):
+        self.action = action
+
+    def get_text(self):
+        return self.name

@@ -63,12 +63,13 @@ class VisualisationFeatureBase(ABC):
         if self.is_enabled():
             self._render(surface)
 
-    def describe_state(self) -> str:
+    def describe_state(self, include_enabled: bool = True) -> str:
         """
         Describes the state of the visualisation feature
+        :param include_enabled: whether to include if the feature is enabled in the description as the first line
         :return: a string describing the state of the visualisation feature
         """
-        description = f"{self.__class__.__name__} is enabled: {self.is_enabled()}"
+        description = f"{self.__class__.__name__} is enabled: {self.is_enabled()}" if include_enabled else self.__class__.__name__
         state_description = self._describe_state()
         if state_description:
             description += f"\n{state_description}"

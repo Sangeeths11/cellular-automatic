@@ -69,3 +69,13 @@ class TargetHeatmapVisualisationFeature(VisualisationFeatureBase):
                     value_text = self._font.render(f"{value:.2f}", True, (40, 40, 40))
                     text_pos = self._helper.get_centered_pos(x, y)
                     surface.blit(value_text, value_text.get_rect(center=text_pos))
+
+        if self._selected_target is not None:
+            min_x, min_y, max_x, max_y = float('inf'), float('inf'), 0, 0
+            for cell in self._selected_target.get_cells():
+                min_x = min(min_x, cell.get_x())
+                min_y = min(min_y, cell.get_y())
+                max_x = max(max_x, cell.get_x())
+                max_y = max(max_y, cell.get_y())
+
+            pygame.draw.rect(surface, (255, 255, 255), self._helper.get_rect_with_size(min_x, min_y, max_x - min_x + 1, max_y - min_y + 1), 2)

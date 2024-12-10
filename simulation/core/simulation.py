@@ -29,6 +29,9 @@ class Simulation:
         self._occupation_bias_modifier: float | None = occupation_bias_modifier
         self._retargeting_threshold: float | None = retargeting_threshold
 
+    def get_time_resolution(self) -> float:
+        return self._time_resolution
+
     def get_spawners(self) -> ImmutableList[Spawner]:
         return ImmutableList(self._spawners)
 

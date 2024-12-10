@@ -19,7 +19,7 @@ class SimulationInfoVisualisationFeature(VisualisationFeatureBase):
         self._font = pygame.font.SysFont(self._font_name, self._helper.get_cell_size(), bold=True)
 
     def _describe_state(self) -> str:
-        return f"Step: {self._simulation.get_steps()}\nTime: {self._simulation.get_run_time():.2f}s\nPedestrians: {len(self._simulation.get_pedestrians())}\nIs paused: {self._visualisation.is_paused()}"
+        return f"FPS: {self._visualisation._clock.get_fps()}\nStep: {self._simulation.get_steps()}\nTime: {self._simulation.get_run_time():.2f}s\nPedestrians: {len(self._simulation.get_pedestrians())}\nIs paused: {self._visualisation.is_paused()}"
 
     def _translate(self, pos: tuple[int, int], x: int, y: int) -> tuple[int, int]:
         return pos[0] + x, pos[1] + y

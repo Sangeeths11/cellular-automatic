@@ -1,7 +1,9 @@
 import math
 from typing import Tuple, List
 
-from pygame import Color
+import numpy as np
+from pygame import Color, Surface, Rect
+from pygame.font import Font
 
 from simulation.core.position import Position
 import pygame
@@ -29,6 +31,17 @@ class VisualisationHelper:
 
     def _transform_offset(self, pos: Tuple) -> Tuple:
         return pos[0] + self.get_grid_left_offset(), pos[1] + self.get_grid_top_offset(), *pos[2:]
+
+    @staticmethod
+    def hsl_to_rgb(hsl: Tuple[float, float, float]) -> Tuple[int, int, int]:
+        color = Color(0)
+        color.hsla = np.clip(hsl[0], 0, 360), np.clip(hsl[1], 0, 100), np.clip(hsl[2], 0, 100), 100
+        return color.r, color.g, color.b
+
+    @staticmethod
+    def rgb_to_hsl(color: Tuple[int, int, int]) -> Tuple[float, float, float]:
+        color = Color(color)
+        return color.hsla[0], color.hsla[1], color.hsla[2]
 
     @staticmethod
     def translate_polygon_result(func):
@@ -76,6 +89,11 @@ class VisualisationHelper:
     def get_rect(self, x: int, y: int) -> pygame.Rect:
         cell_size = self.get_cell_size()
         return pygame.Rect(x * cell_size, y * cell_size, cell_size, cell_size)
+
+    @translate_rect_result
+    def get_rect_with_size(self, x: int, y: int, width: int, height: int) -> pygame.Rect:
+        cell_size = self.get_cell_size()
+        return pygame.Rect(x * cell_size, y * cell_size, width * cell_size, height * cell_size)
 
     def get_small_rect_at(self, pos: Position) -> pygame.Rect:
         return self.get_small_rect(pos.get_x(), pos.get_y())
@@ -137,3 +155,38 @@ class VisualisationHelper:
     @translate_rect_result
     def get_top_left(self):
         return (0, 0)
+
+    @staticmethod
+    def get_multiline_texts(font: Font, text: str, color: Tuple) -> Tuple[list[Surface], int, int]:
+        lines = text.split("\n")
+        max_width = 0
+        total_height = 0
+        surfaces = []
+        for line in lines:
+            text = font.render(line, True, color)
+            surfaces.append(text)
+            total_height += text.get_height()
+            max_width = max(max_width, text.get_width())
+
+        return surfaces, max_width, total_height
+
+    @staticmethod
+    def render_multiline_text(surface: Surface, rect: Rect, font: Font, text: str, color: Tuple, center_x: bool = False, center_y: bool = False):
+        lines, max_width, total_height = VisualisationHelper.get_multiline_texts(font, text, color)
+        off_y = (rect.height - total_height) // 2 if center_y else 0
+        for line in lines:
+            off_x = (max_width - line.get_width()) // 2 if center_x else 0
+            surface.blit(line, (rect.x + off_x, rect.y + off_y))
+            off_y += line.get_height()
+
+    @staticmethod
+    def render_multiline_text_to_surface(font: Font, text: str, color: Tuple, center_x: bool = False) -> Surface:
+        lines, max_width, total_height = VisualisationHelper.get_multiline_texts(font, text, color)
+        surface = Surface((max_width, total_height), pygame.SRCALPHA)
+        off_y = 0
+        for line in lines:
+            off_x = (max_width - line.get_width()) // 2 if center_x else 0
+            surface.blit(line, (off_x, off_y))
+            off_y += line.get_height()
+
+        return surface
