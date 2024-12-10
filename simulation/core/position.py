@@ -12,7 +12,7 @@ class Position(ABC):
     def get_y(self) -> int:
         return self._y
 
-    def get_position(self) -> tuple[int, int]:
+    def as_tuple(self) -> tuple[int, int]:
         return self._x, self._y
 
     def pos_equals(self, other: object) -> bool:

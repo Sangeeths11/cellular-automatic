@@ -14,7 +14,7 @@ class TestPosition(unittest.TestCase):
         """Tests initialization and getters."""
         self.assertEqual(self.position.get_x(), 1)
         self.assertEqual(self.position.get_y(), 2)
-        self.assertEqual(self.position.get_position(), (1, 2))
+        self.assertEqual(self.position.as_tuple(), (1, 2))
 
     def test_equality(self):
         """Tests the __eq__ and __ne__ methods."""
