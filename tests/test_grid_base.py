@@ -52,8 +52,8 @@ class TestGridBase(unittest.TestCase):
         """Tests that check_bounds raises a SimulationError for invalid coordinates."""
         with self.assertRaises(SimulationError) as context:
             self.grid.check_bounds(5, 5)
-        self.assertEqual(context.exception.get_code(), SimulationErrorCode.INVALID_COORDINATES)
-        self.assertEqual(context.exception.details, {"x": 5, "y": 5})
+        self.assertEqual(context.exception.get_code(), SimulationErrorCode.INVALID_COORDINATES.value[0])
+        self.assertEqual(context.exception._context, {"x": 5, "y": 5})
     
     def test_get_cell_valid(self):
         """Tests whether get_cell returns the correct cell for valid coordinates."""
@@ -66,7 +66,7 @@ class TestGridBase(unittest.TestCase):
         """Tests whether get_cell raises a SimulationError for invalid coordinates."""
         with self.assertRaises(SimulationError) as context:
             self.grid.get_cell(-1, 0)
-        self.assertEqual(context.exception.get_code(), SimulationErrorCode.INVALID_COORDINATES)
+        self.assertEqual(context.exception.get_code(), SimulationErrorCode.INVALID_COORDINATES.value[0])
     
     def test_get_cell_at_pos_valid(self):
         """Tests whether get_cell_at_pos returns the correct cell for a valid position."""
@@ -81,7 +81,7 @@ class TestGridBase(unittest.TestCase):
         pos = Position(5, 5)
         with self.assertRaises(SimulationError) as context:
             self.grid.get_cell_at_pos(pos)
-        self.assertEqual(context.exception.get_code(), SimulationErrorCode.INVALID_COORDINATES)
+        self.assertEqual(context.exception.get_code(), SimulationErrorCode.INVALID_COORDINATES.value[0])
     
     def test_contains_with_cell(self):
         """Tests the __contains__ method with a Cell."""

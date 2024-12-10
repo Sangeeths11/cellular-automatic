@@ -60,7 +60,8 @@ class TestCell(unittest.TestCase):
         """Tests that removing a pedestrian from a free cell raises an exception."""
         with self.assertRaises(SimulationError) as context:
             self.cell.remove_pedestrian()
-        self.assertEqual(context.exception.get_code(), SimulationErrorCode.CELL_NOT_OCCUPIED)
+
+        self.assertEqual(context.exception.get_code(), SimulationErrorCode.CELL_NOT_OCCUPIED.value[0])
 
     def test_is_free(self):
         """Tests the is_free method."""
