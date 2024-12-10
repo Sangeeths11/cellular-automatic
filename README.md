@@ -22,3 +22,8 @@ Dieses Projekt simuliert das Verhalten von Menschenströmen in einer Umgebung mi
 2. Starte die Simulation mit folgendem Befehl:
    ```bash
    python run.py
+
+### Unit-Tests ausführen
+1. Starte die Unit-Tests mit folgendem Befehl:
+   ```bash
+   python -m unittest discover -s tests -p "test_*.py"

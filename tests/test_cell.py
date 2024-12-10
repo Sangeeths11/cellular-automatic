@@ -32,7 +32,7 @@ class TestCell(unittest.TestCase):
         pedestrian = Mock()
         with self.assertRaises(SimulationError) as context:
             self.cell.set_pedestrian(pedestrian)
-        self.assertEqual(context.exception.get_code(), SimulationErrorCode.CELL_BLOCKED)
+        self.assertEqual(context.exception.get_code(), SimulationErrorCode.CELL_BLOCKED.value[0])
 
     def test_eq_method(self):
         """Tests the equality method of the cell."""
