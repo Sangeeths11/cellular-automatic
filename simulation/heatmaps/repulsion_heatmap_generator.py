@@ -12,17 +12,18 @@ from simulation.heatmaps.heatmap import Heatmap
 from simulation.heatmaps.heatmap_generator_base import HeatmapGeneratorBase
 
 
-class SocialDistancingHeatmapGenerator(HeatmapGeneratorBase):
+class RepulsionHeatmapGenerator(HeatmapGeneratorBase):
     """
     Heatmap generator which adds a social distancing force from each occupied cell
     """
 
-    def __init__(self, distancing: DistanceBase, width: float, height: float, blocked: set[CellState] = None):
+    def __init__(self, distancing: DistanceBase, width: float, height: float, blocked: set[CellState] = None, intensity_factor: float|None = None):
         """
         :param distancing: algorithm for calculating distance between cells
         :param width: width of the social distancing force
         :param height: height of the social distancing force
         :param blocked: set of CellStates that are considered blocked, default is {CellState.OCCUPIED}
+        :param intensity_factor: factor to scale the intensity of the repulsion
         """
         super().__init__()
         self._distancing: DistanceBase = distancing
@@ -31,7 +32,7 @@ class SocialDistancingHeatmapGenerator(HeatmapGeneratorBase):
         self._neighbour_width: int = math.ceil(width / 2)
         self._neighbour_height: int = math.ceil(height / 2)
         self._blocked: set[CellState] = blocked or {CellState.OCCUPIED}
-        self._intensity: float = distancing.get_scale()
+        self._intensity: float = distancing.get_scale() * intensity_factor if intensity_factor is not None else 1.0
 
     def get_bias(self, center: Position, neighbour: Position):
         return self._calculate_value(self._distancing.calculate_distance(center, neighbour))
