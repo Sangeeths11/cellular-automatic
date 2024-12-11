@@ -4,6 +4,8 @@ from simulation.core.cell_state import CellState
 from simulation.core.position import Position
 from typing import TYPE_CHECKING
 
+from utils.immutable_list import ImmutableList
+
 if TYPE_CHECKING:
     from simulation.core.cell import Cell
     from simulation.core.target import Target
@@ -36,6 +38,10 @@ class Pedestrian(Position):
         self._total_distance_moved: float = 0
         self._refund_distance_flag = False
         self._reached_target = False
+        self._path: list['Cell'] = []
+
+    def get_path(self) -> ImmutableList['Cell']:
+        return ImmutableList(self._path)
 
     def set_reached_target(self) -> None:
         self._reached_target = True
@@ -86,6 +92,7 @@ class Pedestrian(Position):
         self._total_distance_moved += self._distance_to_target
         # self.set_target_cell(None)
         self._distance_to_target = Pedestrian.INFINITY
+        self._path.append(self._target_cell)
 
     def get_occupation_bias(self) -> float:
         if self._target_cell is None:

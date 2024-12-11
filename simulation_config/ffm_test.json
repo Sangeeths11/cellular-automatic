@@ -1,29 +1,37 @@
 {
   "grid": {
-    "width": 70,
-    "height": 30,
+    "width": 1500,
+    "height": 1000,
     "neighbourhood": "MooreNeighbourhood"
   },
   "obstacles": [
     {
       "name": "u-upper",
-      "rect": [10, 7, 30, 7]
+      "rect": [150, 300, 500, 300]
     },
     {
       "name": "u-lower",
-      "rect": [10, 22, 30, 22]
+      "rect": [150, 700, 500, 700]
     },
     {
       "name": "u-vertical",
-      "rect": [30, 7, 30, 22]
+      "rect": [500, 300, 500, 700]
+    },
+    {
+      "name": "upper-line",
+      "rect": [1200, 0, 1200, 700]
+    },
+    {
+      "name": "lower-line",
+      "rect": [1400, 300, 1400, 999]
     }
   ],
   "spawners": [
     {
       "name": "Spawner",
-      "cells": [[0, 13], [0, 14], [0, 15], [0, 16]],
+      "rect": [0, 400, 0, 600],
       "targets": ["Target"],
-      "total_spawns": 1,
+      "total_spawns": 20,
       "batch_size": 1,
       "spawn_delay": 1,
       "initial_delay": 0.0
@@ -32,8 +40,8 @@
   "targets": [
     {
       "name": "Target",
-      "cells": [[69, 13], [69, 14], [69, 15], [69, 16]],
-      "heatmap_generator": "FastMarchingHeatmapGenerator",
+      "rect": [1499, 400, 1499, 600],
+      "heatmap_generator": "DijkstraHeatmapGenerator",
       "cellstate": ["OBSTACLE"]
     }
   ],
@@ -41,19 +49,13 @@
     "width": 3,
     "height": 3
   },
-  "obstacle_repulsion": {
-    "width": 3,
-    "height": 3,
-    "intensity": 2.0
-  },
   "simulation": {
     "time_resolution": 0.1,
-    "occupation_bias_modifier": 1.0,
-    "retargeting_threshold": -2.0,
-    "last_position_bias": 1.0
+    "occupation_bias_modifier": 2.0,
+    "retargeting_threshold": -2.0
   },
   "distancing": {
     "type": "EuclideanDistance",
-    "scale": 0.5
+    "scale": 0.1
   }
 }

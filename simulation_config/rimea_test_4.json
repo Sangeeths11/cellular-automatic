@@ -1,30 +1,34 @@
 {
   "grid": {
-    "width": 70,
-    "height": 30,
+    "width": 210,
+    "height": 22,
     "neighbourhood": "MooreNeighbourhood"
   },
   "obstacles": [
     {
-      "name": "u-upper",
-      "rect": [10, 7, 30, 7]
+      "name": "left_center",
+      "rect": [7, 8, 11, 12]
     },
     {
-      "name": "u-lower",
-      "rect": [10, 22, 30, 22]
+      "name": "middle_center",
+      "rect": [97, 8, 101, 16]
     },
     {
-      "name": "u-vertical",
-      "rect": [30, 7, 30, 22]
+      "name": "upper_wall",
+      "rect": [0, 0, 209, 0]
+    },
+    {
+      "name": "lower_wall",
+      "rect": [0, 21, 209, 21]
     }
   ],
   "spawners": [
     {
       "name": "Spawner",
-      "cells": [[0, 13], [0, 14], [0, 15], [0, 16]],
+      "rect": [0, 1, 0, 20],
       "targets": ["Target"],
-      "total_spawns": 1,
-      "batch_size": 1,
+      "total_spawns": 100,
+      "batch_size": 3,
       "spawn_delay": 1,
       "initial_delay": 0.0
     }
@@ -32,7 +36,7 @@
   "targets": [
     {
       "name": "Target",
-      "cells": [[69, 13], [69, 14], [69, 15], [69, 16]],
+      "rect": [209, 1, 209, 20],
       "heatmap_generator": "FastMarchingHeatmapGenerator",
       "cellstate": ["OBSTACLE"]
     }
@@ -49,8 +53,7 @@
   "simulation": {
     "time_resolution": 0.1,
     "occupation_bias_modifier": 1.0,
-    "retargeting_threshold": -2.0,
-    "last_position_bias": 1.0
+    "retargeting_threshold": -2.0
   },
   "distancing": {
     "type": "EuclideanDistance",
