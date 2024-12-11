@@ -44,7 +44,7 @@ def main():
         target_obj = Target(target_config["name"], target_cells, grid, heatmap_generator)
         target_mapping[target_config["name"]] = target_obj
 
-    
+
     spawners = []
     for spawner_config in simulation_config["spawners"]:
         spawner_cells = list(get_cells(spawner_config, grid))
