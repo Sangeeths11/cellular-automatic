@@ -34,7 +34,7 @@ class DijkstraHeatmapGenerator(HeatmapGeneratorBase):
             visited.push(cell, 0)
 
         for cell in grid.get_cells():
-            if cell.get_state() == CellState.OBSTACLE:  # can't enter cells which aren't free
+            if cell.get_state() in self._blocked:  # can't enter cells which aren't free
                 heatmap.set_cell(cell.get_x(), cell.get_y(), Heatmap.INFINITY)
                 visited.mark_visited(cell)
 

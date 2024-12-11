@@ -26,7 +26,7 @@ class GridBase[T](ABC):
     def get_height(self) -> int:
         return self._height
 
-    def get_cells(self) -> ImmutableList[Cell]:
+    def get_cells(self) -> ImmutableList[T]:
         return ImmutableList(self.cells)
 
     def _get_cell_index(self, x: int, y: int) -> int:

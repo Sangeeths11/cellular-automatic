@@ -11,6 +11,7 @@ from simulation.heatmaps.heatmap import Heatmap
 from simulation.heatmaps.heatmap_generator_base import HeatmapGeneratorBase
 from simulation.heatmaps.pathfinding_queue import PathfindingQueue
 from simulation.neighbourhood.base_neighbourhood import NeighbourhoodBase
+from simulation.neighbourhood.moore_neighbourhood import MooreNeighbourhood
 from simulation.neighbourhood.neumann_neighbourhood import NeumannNeighbourhood
 
 class FastMarchingHeatmapGenerator(HeatmapGeneratorBase):
@@ -56,13 +57,13 @@ class FastMarchingHeatmapGenerator(HeatmapGeneratorBase):
         elif len(fixed_neighbours) == 2:
             a = heatmap.get_cell_at_pos(fixed_neighbours[0])
             b = heatmap.get_cell_at_pos(fixed_neighbours[1])
-            return (a + b + math.sqrt(2 * self._delta_x**2 - ((a - b) ** 2))) / 2
+            return (a + b + math.sqrt(2 * (1/self._delta_x)**2 - ((a - b) ** 2))) / 2
         elif len(fixed_neighbours) == 3:
             single = fixed_neighbours[0] if self._are_opposite(fixed_neighbours[1], fixed_neighbours[2]) else fixed_neighbours[1] if self._are_opposite(fixed_neighbours[0], fixed_neighbours[2]) else fixed_neighbours[2]
             others = [heatmap.get_cell_at_pos(neighbour) for neighbour in fixed_neighbours if neighbour != single]
             a = heatmap.get_cell_at_pos(single)
             b = min(others[0], others[1])
-            return (a + b + math.sqrt(2 * self._delta_x**2 - ((a - b) ** 2))) / 2
+            return (a + b + math.sqrt(2 * (1/self._delta_x)**2 - ((a - b) ** 2))) / 2
 
 
 

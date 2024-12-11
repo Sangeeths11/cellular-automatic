@@ -1,10 +1,15 @@
 import unittest
 from unittest.mock import Mock
+
+from simulation.core.cell_state import CellState
+from simulation.heatmaps.distancing.euclidean_distance import EuclideanDistance
 from simulation.heatmaps.djisktra_heatmap_generator import DijkstraHeatmapGenerator
 from simulation.core.cell import Cell
 from simulation.core.simulation_grid import SimulationGrid
 from simulation.heatmaps.heatmap import Heatmap
 from simulation.heatmaps.distancing.base_distance import DistanceBase
+from simulation.neighbourhood.moore_neighbourhood import MooreNeighbourhood
+
 
 class TestDijkstraHeatmapGenerator(unittest.TestCase):
     def setUp(self):
@@ -36,6 +41,71 @@ class TestDijkstraHeatmapGenerator(unittest.TestCase):
         for cell in self.cells:
             heatmap.set_cell_at_pos(cell, 0)
             self.assertEqual(heatmap.get_cell_at_pos(cell), 0)
+
+    def test_call_generate_heatmap__generates__expected_values_of_dijkstra(self):
+        """Tests the generate_heatmap method to see if dijkstra algorithm is correctly implemented."""
+        # Arrange
+        grid = SimulationGrid(3, 3, MooreNeighbourhood)
+        distance = EuclideanDistance(1)
+        generator = DijkstraHeatmapGenerator(distance)
+
+        # Act
+        heatmap = generator.generate_heatmap([grid.get_cell(1, 1)], grid)
+
+        # Assert
+        expected: list[float] = [
+            1.4, 1.0, 1.4,
+            1.0, 0.0, 1.0,
+            1.4, 1.0, 1.4
+        ]
+
+        for i, value in enumerate(heatmap.get_cells()):
+            self.assertAlmostEqual(value, expected[i], places=1)
+
+    def test_call_generate_heatmap__generates__expected_values_of_dijkstra__with_obstacle(self):
+        """Tests the generate_heatmap method to see if dijkstra algorithm is correctly implemented."""
+        # Arrange
+        grid = SimulationGrid(3, 3, MooreNeighbourhood)
+        distance = EuclideanDistance(1)
+        generator = DijkstraHeatmapGenerator(distance, {CellState.OBSTACLE})
+
+        grid.get_cell(1, 0).set_osbtacle()
+
+        # Act
+        heatmap = generator.generate_heatmap([grid.get_cell(1, 1)], grid)
+
+        # Assert
+        expected: list[float] = [
+            1.4, float('inf'), 1.4,
+            1.0, 0.0, 1.0,
+            1.4, 1.0, 1.4
+        ]
+
+        for i, value in enumerate(heatmap.get_cells()):
+            self.assertAlmostEqual(value, expected[i], places=1)
+
+    def test_call_generate_heatmap__ignores_obstacle__when_not_in_block_list(self):
+        """Tests the generate_heatmap method to see if dijkstra algorithm is correctly implemented."""
+        # Arrange
+        grid = SimulationGrid(3, 3, MooreNeighbourhood)
+        distance = EuclideanDistance(1)
+        generator = DijkstraHeatmapGenerator(distance, {})
+
+        grid.get_cell(1, 0).set_osbtacle()
+
+        # Act
+        heatmap = generator.generate_heatmap([grid.get_cell(1, 1)], grid)
+
+        # Assert
+        expected: list[float] = [
+            1.4, 1.0, 1.4,
+            1.0, 0.0, 1.0,
+            1.4, 1.0, 1.4
+        ]
+
+        for i, value in enumerate(heatmap.get_cells()):
+            self.assertAlmostEqual(value, expected[i], places=1)
+
 
 if __name__ == '__main__':
     unittest.main()
