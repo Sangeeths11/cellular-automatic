@@ -43,6 +43,9 @@ class Pedestrian(Position):
     def get_path(self) -> ImmutableList['Cell']:
         return ImmutableList(self._path)
 
+    def set_path(self, path: list['Cell']) -> None:
+        self._path = path
+
     def set_reached_target(self) -> None:
         self._reached_target = True
 
@@ -92,7 +95,6 @@ class Pedestrian(Position):
         self._total_distance_moved += self._distance_to_target
         # self.set_target_cell(None)
         self._distance_to_target = Pedestrian.INFINITY
-        self._path.append(self._target_cell)
 
     def get_occupation_bias(self) -> float:
         if self._target_cell is None:

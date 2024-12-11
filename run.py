@@ -83,7 +83,7 @@ def main():
         spawners,
         simulation_config["simulation"].get("occupation_bias_modifier", 1.0),
         simulation_config["simulation"].get("retargeting_threshold", -1.0),
-        simulation_config["simulation"].get("last_position_bias", None),
+        simulation_config["simulation"].get("look_ahead_depth", None),
     )
 
     vis = Visualisation(sim)

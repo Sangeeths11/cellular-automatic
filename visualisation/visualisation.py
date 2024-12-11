@@ -113,6 +113,8 @@ class Visualisation:
         self.add_shortcut(Shortcut("Toggle social distancing", pygame.K_d, 0, heatmap.set_social_distancing, True, heatmap.get_social_distancing()), True, "Social distancing\n{0}")
         self.add_shortcut(Shortcut("Toggle obstacle repulsion", pygame.K_o, 0, heatmap.set_obstacle_repulsion, True, heatmap.get_obstacle_repulsion()), True, "Obstacle repulsion\n{0}")
         self.add_shortcut(Shortcut("Toggle route", pygame.K_r, 0, path.set_enabled, True, path.is_enabled()), True, "Pathing {0}")
+        if self.simulation._look_ahead_depth is not None:
+            self.add_shortcut(Shortcut("Toggle target cell path", pygame.K_r, pygame.KMOD_LSHIFT, path.set_target_cell_paths, True, path.get_target_cell_paths()), True, "Target Cell\nPath: {0}")
         self.add_shortcut(Shortcut("Toggle grid lines", pygame.K_l, 0, grid.set_show_lines, True, grid.get_show_lines()), True, "Grid lines\n{0}")
         self.add_shortcut(Shortcut("Show object names", pygame.K_n, 0, self._set_show_names, True, False), True, "Show names\n{0}")
         self.add_shortcut(Shortcut("Show pedestrian details", pygame.K_p, pygame.KMOD_LSHIFT, pedestrian.set_render_details, True, pedestrian.get_render_details()), True, "Pedestrian details\n{0}")

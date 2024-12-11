@@ -1,34 +1,34 @@
 {
   "grid": {
-    "width": 210,
-    "height": 22,
+    "width": 105,
+    "height": 11,
     "neighbourhood": "MooreNeighbourhood"
   },
   "obstacles": [
     {
       "name": "left_center",
-      "rect": [7, 8, 11, 12]
+      "rect": [3, 4, 5, 6]
     },
     {
       "name": "middle_center",
-      "rect": [97, 8, 101, 16]
+      "rect": [47, 4, 50, 8]
     },
     {
       "name": "upper_wall",
-      "rect": [0, 0, 209, 0]
+      "rect": [0, 0, 104, 0]
     },
     {
       "name": "lower_wall",
-      "rect": [0, 21, 209, 21]
+      "rect": [0, 10, 104, 10]
     }
   ],
   "spawners": [
     {
       "name": "Spawner",
-      "rect": [0, 1, 0, 20],
+      "rect": [0, 1, 0, 9],
       "targets": ["Target"],
       "total_spawns": 100,
-      "batch_size": 3,
+      "batch_size": 1,
       "spawn_delay": 1,
       "initial_delay": 0.0
     }
@@ -36,7 +36,7 @@
   "targets": [
     {
       "name": "Target",
-      "rect": [209, 1, 209, 20],
+      "rect": [104, 1, 104, 9],
       "heatmap_generator": "FastMarchingHeatmapGenerator",
       "cellstate": ["OBSTACLE"]
     }
@@ -46,8 +46,8 @@
     "height": 3
   },
   "obstacle_repulsion": {
-    "width": 2,
-    "height": 2,
+    "width": 1,
+    "height": 1,
     "intensity": 1.0
   },
   "simulation": {

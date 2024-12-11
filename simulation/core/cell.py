@@ -50,3 +50,6 @@ class Cell(Position):
 
     def is_occupied(self):
         return self._state == CellState.OCCUPIED
+
+    def is_obstacle(self):
+        return self._state == CellState.OBSTACLE
