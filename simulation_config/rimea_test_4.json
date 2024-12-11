@@ -46,9 +46,9 @@
     "height": 3
   },
   "obstacle_repulsion": {
-    "width": 2,
-    "height": 2,
-    "intensity": 1.0
+    "width": 3,
+    "height": 3,
+    "intensity": 2.0
   },
   "simulation": {
     "time_resolution": 0.1,
