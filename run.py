@@ -1,15 +1,15 @@
 from typing import Generator
 
 from simulation.core.cell import Cell
+from simulation.core.cell_state import CellState
 from simulation.core.simulation import Simulation
 from simulation.core.simulation_grid import SimulationGrid
 from simulation.core.spawner import Spawner
 from simulation.core.target import Target
 from simulation.core.targeting_stratey import TargetingStrategy
-from simulation.heatmaps.social_distancing_heatmap_generator import SocialDistancingHeatmapGenerator
+from simulation.heatmaps.repulsion_heatmap_generator import RepulsionHeatmapGenerator
 from visualisation.visualisation import Visualisation
 from simulation_config.config_loader import SimulationConfigLoader
-
 
 
 def get_cells(config, grid) -> Generator[Cell]:
@@ -26,7 +26,8 @@ def main():
 
     neighbourhood_class = SimulationConfigLoader.get_neighbourhood_class(simulation_config["grid"]["neighbourhood"])
     grid = SimulationGrid(simulation_config["grid"]["width"], simulation_config["grid"]["height"], neighbourhood_class)
-    
+
+
     if "obstacles" in simulation_config:
         for obstacle in simulation_config["obstacles"]:
             for cell in get_cells(obstacle, grid):
@@ -48,7 +49,7 @@ def main():
     for spawner_config in simulation_config["spawners"]:
         spawner_cells = list(get_cells(spawner_config, grid))
         spawner_targets = [target_mapping[name] for name in spawner_config["targets"]]
-        targeting = TargetingStrategy[spawner_config.get("targeting", "RANDOM")]
+        targeting = TargetingStrategy[spawner_config["targeting"]] if "targeting" in spawner_config else TargetingStrategy.RANDOM
         spawners.append(Spawner(
             spawner_config["name"], distancing, spawner_cells, spawner_targets,
             spawner_config["total_spawns"], spawner_config["batch_size"],
@@ -56,21 +57,33 @@ def main():
             targeting
         ))
 
-    social_distancing = SocialDistancingHeatmapGenerator(
+    social_distancing = RepulsionHeatmapGenerator(
         distancing,
         simulation_config["social_distancing"]["width"],
-        simulation_config["social_distancing"]["height"]
+        simulation_config["social_distancing"]["height"],
+        {CellState.OCCUPIED},
+        simulation_config["social_distancing"].get("intensity", None)
     )
+
+    obstacle_repulsion = RepulsionHeatmapGenerator(
+        distancing,
+        simulation_config["obstacle_repulsion"]["width"],
+        simulation_config["obstacle_repulsion"]["height"],
+        {CellState.OBSTACLE},
+        simulation_config["obstacle_repulsion"].get("intensity", None)
+    ) if "obstacle_repulsion" in simulation_config else None
 
     sim = Simulation(
         simulation_config["simulation"]["time_resolution"],
         grid,
         distancing,
         social_distancing,
+        obstacle_repulsion,
         list(target_mapping.values()),
         spawners,
         simulation_config["simulation"].get("occupation_bias_modifier", 1.0),
-        simulation_config["simulation"].get("retargeting_threshold", -1.0)
+        simulation_config["simulation"].get("retargeting_threshold", -1.0),
+        simulation_config["simulation"].get("last_position_bias", None),
     )
 
     vis = Visualisation(sim)

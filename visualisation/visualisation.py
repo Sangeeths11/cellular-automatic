@@ -111,6 +111,7 @@ class Visualisation:
         self.add_shortcut(Shortcut("Toggle pedestrian", pygame.K_p, 0, pedestrian.set_enabled, True, pedestrian.is_enabled()), True, "Pedestrians {0}")
         self.add_shortcut(Shortcut("Toggle info", pygame.K_i, 0, info.set_enabled, True, info.is_enabled()), True, "Info {0}")
         self.add_shortcut(Shortcut("Toggle social distancing", pygame.K_d, 0, heatmap.set_social_distancing, True, heatmap.get_social_distancing()), True, "Social distancing\n{0}")
+        self.add_shortcut(Shortcut("Toggle obstacle repulsion", pygame.K_o, 0, heatmap.set_obstacle_repulsion, True, heatmap.get_obstacle_repulsion()), True, "Obstacle repulsion\n{0}")
         self.add_shortcut(Shortcut("Toggle route", pygame.K_r, 0, path.set_enabled, True, path.is_enabled()), True, "Pathing {0}")
         self.add_shortcut(Shortcut("Toggle grid lines", pygame.K_l, 0, grid.set_show_lines, True, grid.get_show_lines()), True, "Grid lines\n{0}")
         self.add_shortcut(Shortcut("Show object names", pygame.K_n, 0, self._set_show_names, True, False), True, "Show names\n{0}")

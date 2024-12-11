@@ -4,7 +4,7 @@ from unittest.mock import Mock
 
 from simulation.core.pedestrian import Pedestrian
 from simulation.heatmaps.distancing.euclidean_distance import EuclideanDistance
-from simulation.heatmaps.social_distancing_heatmap_generator import SocialDistancingHeatmapGenerator
+from simulation.heatmaps.repulsion_heatmap_generator import RepulsionHeatmapGenerator
 from simulation.core.cell import Cell
 from simulation.core.simulation_grid import SimulationGrid
 from simulation.heatmaps.heatmap import Heatmap
@@ -18,7 +18,7 @@ class TestSocialDistancingHeatmapGenerator(unittest.TestCase):
         self.distancing = Mock(spec=DistanceBase)
         self.grid = Mock(spec=SimulationGrid)
         self.cells = [Mock(spec=Cell) for _ in range(3)]
-        self.heatmap_generator = SocialDistancingHeatmapGenerator(self.distancing, width=3.0, height=3.0)
+        self.heatmap_generator = RepulsionHeatmapGenerator(self.distancing, width=3.0, height=3.0)
 
         for i, cell in enumerate(self.cells):
             cell.get_x.return_value = i
@@ -56,7 +56,7 @@ class TestSocialDistancingHeatmapGenerator(unittest.TestCase):
         grid = SimulationGrid(3, 3, MooreNeighbourhood)
         pedestrian = Mock(spec=Pedestrian)
         grid.get_cell(0,0).set_pedestrian(pedestrian)
-        generator = SocialDistancingHeatmapGenerator(distancing, 3, 3, {CellState.OCCUPIED})
+        generator = RepulsionHeatmapGenerator(distancing, 3, 3, {CellState.OCCUPIED})
 
         # Act
         heatmap = generator.generate_heatmap([grid.get_cell(0,0)], grid)
@@ -81,7 +81,7 @@ class TestSocialDistancingHeatmapGenerator(unittest.TestCase):
         grid = SimulationGrid(3, 3, MooreNeighbourhood)
         pedestrian = Mock(spec=Pedestrian)
         grid.get_cell(0,0).set_pedestrian(pedestrian)
-        generator = SocialDistancingHeatmapGenerator(distancing, 3, 3, {})
+        generator = RepulsionHeatmapGenerator(distancing, 3, 3, {})
 
         # Act
         heatmap = generator.generate_heatmap([grid.get_cell(0,0)], grid)
