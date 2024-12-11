@@ -26,20 +26,27 @@ class TestFastMarchingHeatmapGenerator(unittest.TestCase):
 
     def test_generate_heatmap(self):
         """Tests the generate_heatmap method."""
-        self.grid.get_width.return_value = 5
-        self.grid.get_height.return_value = 5
+        self.grid.get_width.return_value = 3
+        self.grid.get_height.return_value = 3
         self.grid.get_cells.return_value = self.cells
+
         self.grid.get_neighbours_at.side_effect = lambda pos: [
             cell for cell in self.cells if cell.get_x() != pos.get_x() or cell.get_y() != pos.get_y()
         ]
 
+        self.cells[1].get_state.return_value = CellState.OBSTACLE
+
         heatmap = self.heatmap_generator.generate_heatmap(self.cells, self.grid)
 
-        self.assertIsInstance(heatmap, Heatmap)
-        self.assertEqual(heatmap.get_width(), 5)
-        self.assertEqual(heatmap.get_height(), 5)
-        for cell in self.cells:
-            self.assertEqual(heatmap.get_cell_at_pos(cell), 0)
+        expected_grid = [
+            [0, 1, 2],
+            [1, float('inf'), 3],
+            [2, 3, 4]
+        ]
+
+        for y in range(3):
+            for x in range(3):
+                self.assertEqual(heatmap.get_cell(x, y), expected_grid[y][x], f"Mismatch at ({x}, {y})")
 
 if __name__ == '__main__':
     unittest.main()
