@@ -18,6 +18,7 @@ class PathVisualisationFeature(VisualisationFeatureBase):
         super().__init__(sim, vis, vis_helper)
         self._selected_pedestrian: Pedestrian = None
         self._selected_pedestrian_index = 0
+        self._show_target_cell_paths = False
 
     def next_pedestrian(self):
         pedestrians = self._simulation.get_pedestrians()
@@ -28,6 +29,12 @@ class PathVisualisationFeature(VisualisationFeatureBase):
         pedestrians = self._simulation.get_pedestrians()
         self._selected_pedestrian_index = (self._selected_pedestrian_index - 1) % (len(pedestrians) + 1)
         self._selected_pedestrian = None if self._selected_pedestrian_index == 0 else pedestrians[self._selected_pedestrian_index - 1]
+
+    def set_target_cell_paths(self, value: bool):
+        self._show_target_cell_paths = value
+
+    def get_target_cell_paths(self) -> bool:
+        return self._show_target_cell_paths
 
     def set_pedestrian(self, pedestrian: 'Pedestrian|None'):
         if pedestrian is None:
@@ -41,6 +48,15 @@ class PathVisualisationFeature(VisualisationFeatureBase):
         return f"Selected pedestrian: {'None' if self._selected_pedestrian is None else self._selected_pedestrian.get_id()}"
 
     def _render(self, surface: Surface) -> None:
+        if self._show_target_cell_paths and self._simulation._look_ahead_depth is not None:
+            for pedestrian in self._simulation.get_pedestrians():
+                path = pedestrian.get_path()
+                if path is not None:
+                    last = path[0]
+                    for cell in path[1:]:
+                        pygame.draw.line(surface, (200, 200, 200), self._helper.get_centered_pos_at(last), self._helper.get_centered_pos_at(cell), 3)
+                        last = cell
+
         if self._selected_pedestrian is not None:
             if self._selected_pedestrian.has_reached_target():
                 self.set_pedestrian(None)
@@ -53,7 +69,7 @@ class PathVisualisationFeature(VisualisationFeatureBase):
             visited: set[Position] = set()
             visited.add(last_pos)
             while last_pos is not None:
-                next_pos: Position = self._simulation._get_next_target_cell(heatmap, last_pos, self._selected_pedestrian)
+                next_pos, path = self._simulation._get_next_target_cell(heatmap, last_pos, self._selected_pedestrian)
                 if next_pos is None or next_pos in visited:
                     break
 

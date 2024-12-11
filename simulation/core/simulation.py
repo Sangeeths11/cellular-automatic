@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from simulation.core.cell import Cell
 from simulation.core.position import Position
 from simulation.core.spawner import Spawner
@@ -13,7 +15,7 @@ from utils.immutable_list import ImmutableList
 
 
 class Simulation:
-    def __init__(self, time_resolution: float, grid: SimulationGrid, distancing: DistanceBase, social_distancing: RepulsionHeatmapGenerator, obstacle_repulsion: RepulsionHeatmapGenerator, targets: list[Target], spawners: list[Spawner], occupation_bias_modifier: float | None = 1.0, retargeting_threshold: float | None = -1.0, last_position_bias: float | None = None):
+    def __init__(self, time_resolution: float, grid: SimulationGrid, distancing: DistanceBase, social_distancing: RepulsionHeatmapGenerator, obstacle_repulsion: RepulsionHeatmapGenerator, targets: list[Target], spawners: list[Spawner], occupation_bias_modifier: float | None = 1.0, retargeting_threshold: float | None = -1.0, look_ahead_depth: int | None = None):
         self._pedestrians: list[Pedestrian] = list()
         self._grid: SimulationGrid = grid
         self._targets: list[Target] = targets
@@ -28,7 +30,7 @@ class Simulation:
         self._retargeting_threshold: float | None = retargeting_threshold
         self._obstacle_repulsion_heatmap_generator: RepulsionHeatmapGenerator = obstacle_repulsion
         self._obstacle_repulsion_heatmap: Heatmap = None
-        self._last_position_bias: float|None = last_position_bias
+        self._look_ahead_depth: int|None = look_ahead_depth
 
     def get_time_resolution(self) -> float:
         return self._time_resolution
@@ -106,33 +108,53 @@ class Simulation:
         for target in self._targets:
             target.update_heatmap()
 
-    def _get_cell_value(self, last_pos: Position, path: ImmutableList[Position], cell: Cell, heatmap: Heatmap) -> float:
+    def _get_cell_value(self, last_pos: Position, cell: Cell, heatmap: Heatmap) -> float:
         value = heatmap.get_cell_at_pos(cell)
         value += self._obstacle_repulsion_heatmap.get_cell_at_pos(cell)
         value += min(0, self._distancing_heatmap.get_cell_at_pos(cell) - self._social_distancing_generator.get_bias(last_pos, cell))
         if self._occupation_bias_modifier is not None:
             value += (self._occupation_bias_modifier * cell.get_pedestrian().get_occupation_bias()) if cell.is_occupied() else 0
 
-        if self._last_position_bias is not None and path is not None and any(p.pos_equals(cell) for p in path):
-            value += self._last_position_bias
 
         return value
 
-    def _get_next_target_cell(self, heatmap: Heatmap, pos: Position, last_pos: Position, path: ImmutableList[Position] = None) -> Cell | None:
-        neighbours = self._grid.get_neighbours_at(pos)
-        neighbours = sorted(neighbours, key=lambda n: self._get_cell_value(last_pos, path, n, heatmap))
-        for cell in neighbours:
+    def _look_ahead(self, depth: int, last_pos: Position, cell: Cell, heatmap: Heatmap) -> Tuple[float, list[Cell]]:
+        if heatmap.get_cell_at_pos(cell) <= 0.0:
+            return float("-inf"), []
+
+        path: list[Cell] = []
+        total_value = 0
+        for i in range(depth):
+            neighbours = self._grid.get_neighbours_at(cell)
+            values = [(cell, self._get_cell_value(last_pos if i == 0 else cell, cell, heatmap)) for cell in neighbours]
+            cell, value = min(values, key=lambda n: n[1])
+            total_value += value
+            path.append(cell)
+            if heatmap.get_cell_at_pos(cell) == 0:
+                return total_value, path
+
+        return total_value, path
+
+
+    def _get_next_target_cell(self, heatmap: Heatmap, pos: Position, last_pos: Position) -> Tuple[Cell|None, list[Cell]|None]:
+        neighbours = [x for x in self._grid.get_neighbours_at(pos) if x.is_obstacle() is False]
+        values = [(cell, *self._look_ahead(self._look_ahead_depth, last_pos, cell, heatmap)) for cell in neighbours] if self._look_ahead_depth is not None else [(cell, self._get_cell_value(last_pos, cell, heatmap), None) for cell in neighbours]
+        lowest = sorted(values, key=lambda n: n[1])
+        for cell, value, path in lowest:
             if self._occupation_bias_modifier is not None or cell.is_free():
-                return cell
+                if path is not None:
+                    path.insert(0, cell)
 
-        return None
+                return cell, path
 
-    def _get_next_pedestrian_target(self, pedestrian: Pedestrian, last_pos: Position) -> Cell | None:
+        return None, None
+
+    def _get_next_pedestrian_target(self, pedestrian: Pedestrian, last_pos: Position) -> Tuple[Cell|None, list[Cell]|None]:
         if pedestrian.is_inside_target():
             self._remove_pedestrian(pedestrian)
-            return None
+            return None, None
         else:
-            return self._get_next_target_cell(pedestrian.get_target().get_heatmap(), pedestrian, last_pos, pedestrian.get_path())
+            return self._get_next_target_cell(pedestrian.get_target().get_heatmap(), pedestrian, last_pos)
 
     def _update_pedestrians(self, delta: float):
         for pedestrian in sorted(self._pedestrians, key=lambda p: p.get_current_distance()):
@@ -142,15 +164,15 @@ class Simulation:
                 cell.remove_pedestrian()
                 pedestrian.move()
                 pedestrian.get_targeted_cell().set_pedestrian(pedestrian)
-                new_target_cell = self._get_next_pedestrian_target(pedestrian, cell)
+                new_target_cell, path = self._get_next_pedestrian_target(pedestrian, cell)
                 pedestrian.set_target_cell(new_target_cell)
-
+                pedestrian.set_path(path)
             elif pedestrian.has_targeted_cell() is False:
-                new_target_cell = self._get_next_pedestrian_target(pedestrian, pedestrian)
+                new_target_cell, path = self._get_next_pedestrian_target(pedestrian, pedestrian)
                 pedestrian.set_target_cell(new_target_cell)
-
+                pedestrian.set_path(path)
                 # if the target cell is occupied, try to find a new target cell to avoid deadlocks
             elif pedestrian.get_targeted_cell().is_occupied() and self._retargeting_threshold is not None and self._retargeting_threshold > pedestrian.get_current_distance():
-                new_target_cell = self._get_next_pedestrian_target(pedestrian, pedestrian)
+                new_target_cell, path = self._get_next_pedestrian_target(pedestrian, pedestrian)
                 pedestrian.set_target_cell(new_target_cell)
-
+                pedestrian.set_path(path)
