@@ -1,0 +1,62 @@
+{
+  "grid": {
+    "width": 210,
+    "height": 22,
+    "neighbourhood": "MooreNeighbourhood"
+  },
+  "obstacles": [
+    {
+      "name": "left_center",
+      "rect": [7, 8, 11, 12]
+    },
+    {
+      "name": "middle_center",
+      "rect": [97, 8, 101, 16]
+    },
+    {
+      "name": "upper_wall",
+      "rect": [0, 0, 209, 0]
+    },
+    {
+      "name": "lower_wall",
+      "rect": [0, 21, 209, 21]
+    }
+  ],
+  "spawners": [
+    {
+      "name": "Spawner",
+      "rect": [0, 1, 0, 20],
+      "targets": ["Target"],
+      "total_spawns": 100,
+      "batch_size": 3,
+      "spawn_delay": 1,
+      "initial_delay": 0.0
+    }
+  ],
+  "targets": [
+    {
+      "name": "Target",
+      "rect": [209, 1, 209, 20],
+      "heatmap_generator": "FastMarchingHeatmapGenerator",
+      "cellstate": ["OBSTACLE"]
+    }
+  ],
+  "social_distancing": {
+    "width": 3,
+    "height": 3
+  },
+  "obstacle_repulsion": {
+    "width": 2,
+    "height": 2,
+    "intensity": 1.0
+  },
+  "simulation": {
+    "time_resolution": 0.1,
+    "occupation_bias_modifier": 1.0,
+    "retargeting_threshold": -2.0
+  },
+  "distancing": {
+    "type": "EuclideanDistance",
+    "scale": 0.5
+  }
+}

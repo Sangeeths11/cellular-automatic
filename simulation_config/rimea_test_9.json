@@ -1,0 +1,58 @@
+{
+  "grid": {
+    "width": 75,
+    "height": 50,
+    "neighbourhood": "MooreNeighbourhood"
+  },
+  "spawners": [
+    {
+      "name": "Spawner",
+      "rect": [5, 5, 70, 45],
+      "targets": ["upper-left-door", "upper-right-door", "lower-left-door", "lower-right-door"],
+      "total_spawns": 1,
+      "batch_size": 1000,
+      "spawn_delay": 1,
+      "initial_delay": 0.0,
+      "targeting": "CLOSEST"
+    }
+  ],
+  "targets": [
+    {
+      "name": "upper-left-door",
+      "rect": [10, 0, 13, 0],
+      "heatmap_generator": "FastMarchingHeatmapGenerator",
+      "cellstate": ["OBSTACLE"]
+    },
+    {
+      "name": "upper-right-door",
+      "rect": [62, 0, 65, 0],
+      "heatmap_generator": "FastMarchingHeatmapGenerator",
+      "cellstate": ["OBSTACLE"]
+    },
+    {
+      "name": "lower-left-door",
+      "rect": [10, 49, 13, 49],
+      "heatmap_generator": "FastMarchingHeatmapGenerator",
+      "cellstate": ["OBSTACLE"]
+    },
+    {
+      "name": "lower-right-door",
+      "rect": [62, 49, 65, 49],
+      "heatmap_generator": "FastMarchingHeatmapGenerator",
+      "cellstate": ["OBSTACLE"]
+    }
+  ],
+  "social_distancing": {
+    "width": 3,
+    "height": 3
+  },
+  "simulation": {
+    "time_resolution": 0.1,
+    "occupation_bias_modifier": 1.0,
+    "retargeting_threshold": -2.0
+  },
+  "distancing": {
+    "type": "EuclideanDistance",
+    "scale": 0.4
+  }
+}

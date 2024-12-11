@@ -27,13 +27,13 @@ class FastMarchingHeatmapGenerator(HeatmapGeneratorBase):
         super().__init__()
         if blocked is None:
             blocked = {CellState.OBSTACLE}
-        self._narrowband = NeumannNeighbourhood(1, 1)
+        self._neumann = NeumannNeighbourhood(1, 1)
         self._distancing = distancing
         self._delta_x = distancing.get_scale()
         self._blocked = blocked if blocked is not None else {CellState.OBSTACLE}
 
     def _get_narrow_band(self, cell: Cell, grid: SimulationGrid) -> Generator[Cell]:
-        for x, y in self._narrowband.get_neighbours(cell.get_x(), cell.get_y(), 1, 1):
+        for x, y in self._neumann.get_neighbours(cell.get_x(), cell.get_y(), 1, 1):
             if grid.is_in_bounds(x, y):
                 yield grid.get_cell(x, y)
 
@@ -73,28 +73,29 @@ class FastMarchingHeatmapGenerator(HeatmapGeneratorBase):
         fixed: set[Cell] = set()
 
         for cell in target:
-            visited.push(cell, 0)
+            visited.mark_visited(cell)
             heatmap.set_cell(cell.get_x(), cell.get_y(), 0)
+            fixed.add(cell)
+
+        for cell in target:
+            for neighbour in self._get_narrow_band(cell, grid):
+                if neighbour not in visited:
+                    distance = self._calculate_travel_time(neighbour, heatmap, fixed, grid)
+                    heatmap.set_cell(neighbour.get_x(), neighbour.get_y(), distance)
+                    visited.push(neighbour, distance)
 
         while not visited.is_empty():
-            current = visited.pop()
-            if current in fixed:
-                continue
-
-            fixed.add(current)
-            narrowband = self._get_narrow_band(current, grid)
-            for neighbour in narrowband:
-                if neighbour in fixed:
-                    continue
-
-                if  neighbour.get_state() in self._blocked:
-                    heatmap.set_cell(neighbour.get_x(), neighbour.get_y(), Heatmap.INFINITY)
-                    visited.mark_visited(neighbour)
-                else:
-                    travel_time = self._calculate_travel_time(neighbour, heatmap, fixed, grid)
-                    heatmap.set_cell(neighbour.get_x(), neighbour.get_y(), travel_time)
-                    visited.push(neighbour, travel_time)
-
-
+            lowest = visited.pop()
+            fixed.add(lowest)
+            for neighbour in self._get_narrow_band(lowest, grid):
+                if neighbour not in visited:
+                    if neighbour.get_state() in self._blocked:
+                        heatmap.set_cell(neighbour.get_x(), neighbour.get_y(), Heatmap.INFINITY)
+                        visited.mark_visited(neighbour)
+                    else:
+                        distance = self._calculate_travel_time(neighbour, heatmap, fixed, grid)
+                        if distance < heatmap.get_cell_at_pos(neighbour):
+                            heatmap.set_cell(neighbour.get_x(), neighbour.get_y(), distance)
+                        visited.push(neighbour, distance)
 
         return heatmap
