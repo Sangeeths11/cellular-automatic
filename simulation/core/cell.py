@@ -1,5 +1,6 @@
 from exceptions.simulation_error import SimulationError
 from exceptions.simulation_error_codes import SimulationErrorCode
+from serialization.serializable import Serializable
 from simulation.core.cell_state import CellState
 from simulation.core.position import Position
 
@@ -7,7 +8,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from simulation.core.pedestrian import Pedestrian
 
-class Cell(Position):
+class Cell(Position, Serializable):
     def __init__(self, x: int, y: int, initial_state: CellState = CellState.FREE):
         super().__init__(x, y)
         self._state: CellState = initial_state
@@ -50,3 +51,19 @@ class Cell(Position):
 
     def is_occupied(self):
         return self._state == CellState.OCCUPIED
+
+    def get_identifier(self) -> str:
+        return f"{self._x}_{self._y}"
+
+    def get_serialization_data(self) -> dict[str, any]:
+        data = {
+            "id": self.get_identifier(),
+            "state": int(self._state),
+            "x": self._x,
+            "y": self._y
+        }
+
+        if self._pedestrian is not None:
+            data["pedestrian"] = self._pedestrian.get_identifier()
+
+        return data

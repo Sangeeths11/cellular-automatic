@@ -3,6 +3,7 @@ from typing import Generator
 
 from exceptions.simulation_error import SimulationError
 from exceptions.simulation_error_codes import SimulationErrorCode
+from serialization.serializable import Serializable
 from simulation.core.pedestrian import Pedestrian
 from simulation.core.targeting_stratey import TargetingStrategy
 
@@ -18,7 +19,7 @@ if TYPE_CHECKING:
     from simulation.heatmaps.distancing.base_distance import DistanceBase
 
 
-class Spawner:
+class Spawner(Serializable):
     # clipping is chosen at random
     # TODO: choose better value based on scientific research
     SPEED_DISTRIBUTION = ClippedNormalDistribution(1.34, 0.26, 0.1, 3.0)
@@ -73,3 +74,13 @@ class Spawner:
             speed = self.SPEED_DISTRIBUTION.sample()
             pedestrian = Pedestrian(cell.get_x(), cell.get_y(), speed, self, target, self._distancing)
             yield pedestrian
+
+    def get_serialization_data(self) -> dict[str, any]:
+        return {
+            "id": self.get_identifier(),
+            "total_spawns": self._total_spawns,
+            "current_delay": self._current_delay
+        }
+
+    def get_identifier(self) -> str:
+        return self._name

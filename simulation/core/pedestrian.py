@@ -1,5 +1,6 @@
 from exceptions.simulation_error import SimulationError
 from exceptions.simulation_error_codes import SimulationErrorCode
+from serialization.serializable import Serializable
 from simulation.core.cell_state import CellState
 from simulation.core.position import Position
 from typing import TYPE_CHECKING
@@ -11,7 +12,7 @@ if TYPE_CHECKING:
     from simulation.heatmaps.heatmap import Heatmap
     from simulation.heatmaps.distancing.base_distance import DistanceBase
 
-class Pedestrian(Position):
+class Pedestrian(Position, Serializable):
     NEGATIVE_INFINITY = float('-inf')
     INFINITY = float('inf')
     ID_COUNTER = 0
@@ -117,3 +118,22 @@ class Pedestrian(Position):
 
     def has_targeted_cell(self):
         return self._target_cell is not None
+
+    def get_serialization_data(self) -> dict[str, any]:
+        return {
+            "id": self._id,
+            "average_speed": self.get_average_speed(),
+            "current_distance": self._current_distance,
+            "time_alive": self._time_alive,
+            "total_distance_moved": self._total_distance_moved,
+            "optimal_speed": self._optimal_speed,
+            "target": self._target.get_identifier(),
+            "target_cell": self._target_cell.get_identifier() if self._target_cell is not None else None,
+            "spawner": self._spawner.get_identifier(),
+            "cell_id": f"{self._x}_{self._y}",
+            "x": self._x,
+            "y": self._y,
+        }
+
+    def get_identifier(self) -> str:
+        return str(self._id)

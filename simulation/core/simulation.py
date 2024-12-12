@@ -1,3 +1,5 @@
+import utils.utils
+from serialization.serializable import Serializable
 from simulation.core.cell import Cell
 from simulation.core.position import Position
 from simulation.core.spawner import Spawner
@@ -12,7 +14,7 @@ from simulation.core.simulation_grid import SimulationGrid
 from utils.immutable_list import ImmutableList
 
 
-class Simulation:
+class Simulation(Serializable):
     def __init__(self, time_resolution: float, grid: SimulationGrid, distancing: DistanceBase,
                  social_distancing: SocialDistancingHeatmapGenerator, targets: list[Target], spawners: list[Spawner],
                  occupation_bias_modifier: float | None = 1.0, retargeting_threshold: float | None = -1.0):
@@ -144,3 +146,16 @@ class Simulation:
             elif pedestrian.get_targeted_cell().is_occupied() and self._retargeting_threshold is not None and self._retargeting_threshold > pedestrian.get_current_distance():
                 new_target_cell = self._get_next_pedestrian_target(pedestrian, pedestrian)
                 pedestrian.set_target_cell(new_target_cell)
+
+    def get_serialization_data(self) -> dict[str, any]:
+        return {
+            "run_time": self._run_time,
+            "steps": self._steps,
+            "pedestrians": self._pedestrians,
+            "targets": self._targets,
+            "spawners": self._spawners,
+            "social_distancing_heatmap": utils.utils.heatmap_to_base64(self._distancing_heatmap),
+        }
+
+    def get_identifier(self) -> str:
+        return "simulation"

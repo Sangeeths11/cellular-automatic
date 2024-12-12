@@ -1,9 +1,8 @@
 from exceptions.simulation_error import SimulationError
 from exceptions.simulation_error_codes import SimulationErrorCode
+from serialization.serializable import Serializable
 from simulation.core.position import Position
-
-
-
+from utils import utils
 from typing import TYPE_CHECKING
 
 from utils.immutable_list import ImmutableList
@@ -14,7 +13,7 @@ if TYPE_CHECKING:
     from simulation.heatmaps.heatmap import Heatmap
     from simulation.heatmaps.heatmap_generator_base import HeatmapGeneratorBase
 
-class Target:
+class Target(Serializable):
     def __init__(self, name: str, cells: 'list[Cell]', grid: 'SimulationGrid', heatmap_generator: 'HeatmapGeneratorBase'):
         self._name: str = name
         self._cells: 'list[Cell]' = cells
@@ -55,3 +54,13 @@ class Target:
                 return True
 
         return False
+
+    def get_serialization_data(self) -> dict[str, any]:
+        return {
+            "id": self.get_identifier(),
+            "exit_count": self._exit_count,
+            #"heatmap": utils.heatmap_to_base64(self._heatmap)
+        }
+
+    def get_identifier(self) -> str:
+        return self._name
