@@ -53,7 +53,7 @@ class PathVisualisationFeature(VisualisationFeatureBase):
             visited: set[Position] = set()
             visited.add(last_pos)
             while last_pos is not None:
-                next_pos: Position = self._simulation._get_next_target_cell(heatmap, last_pos)
+                next_pos: Position = self._simulation._get_next_target_cell(heatmap, last_pos, last_pos)
                 if next_pos is None or next_pos in visited:
                     break
 
