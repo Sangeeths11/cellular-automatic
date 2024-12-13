@@ -24,9 +24,7 @@ class FastMarchingHeatmapGenerator(HeatmapGeneratorBase):
         :param delta_x: distance between cells
         :param blocked: set of CellStates that are considered blocked, default is {CellState.OBSTACLE}
         """
-        super().__init__()
-        if blocked is None:
-            blocked = {CellState.OBSTACLE}
+        super().__init__(blocked or {CellState.OBSTACLE})
         self._neumann = NeumannNeighbourhood(1, 1)
         self._distancing = distancing
         self._delta_x = distancing.get_scale()
@@ -51,7 +49,7 @@ class FastMarchingHeatmapGenerator(HeatmapGeneratorBase):
     def _calculate_travel_time(self, cell: Cell, heatmap: Heatmap, fixed: set[Cell], grid: SimulationGrid) -> float:
         fixed_neighbours = list(self._get_fixed_neighbours(cell, fixed, grid))
         if len(fixed_neighbours) == 0:
-            raise SimulationError(SimulationErrorCode.NO_FIXED_NEIGHBOURS, {"cell": cell})
+            return Heatmap.INFINITY
         elif len(fixed_neighbours) == 1:
             return heatmap.get_cell_at_pos(fixed_neighbours[0]) + self._distancing.calculate_distance(cell, fixed_neighbours[0])
         elif len(fixed_neighbours) == 2:

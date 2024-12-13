@@ -21,8 +21,11 @@ class SimulationConfigLoader:
         if generator_name == "FastMarchingHeatmapGenerator":
             return FastMarchingHeatmapGenerator(distancing, blocked_states)
         elif generator_name == "DijkstraHeatmapGenerator":
-            return DijkstraHeatmapGenerator(distancing)
-        raise ValueError(f"Unsupported heatmap generator: {generator_name}")
+            return DijkstraHeatmapGenerator(distancing, blocked_states)
+        elif generator_name is None:
+            return None
+        else:
+            raise ValueError(f"Unsupported heatmap generator: {generator_name}")
 
     @staticmethod
     def get_neighbourhood_class(neighbourhood_name):
@@ -48,7 +51,7 @@ class SimulationConfigLoader:
     def get_cell_states(cellstate_names):
         """Map the cell state names from JSON to the actual CellState objects."""
         try:
-            return {CellState[state_name] for state_name in cellstate_names}
+            return None if cellstate_names is None else {CellState[state_name] for state_name in cellstate_names}
         except KeyError as e:
             raise ValueError(
                 f"Invalid cellstate name: {e.args[0]}. Ensure it matches the CellState enum."

@@ -5,6 +5,8 @@ from simulation.core.cell_state import CellState
 from simulation.core.position import Position
 from typing import TYPE_CHECKING
 
+from simulation.core.waypoint import Waypoint
+
 if TYPE_CHECKING:
     from simulation.core.cell import Cell
     from simulation.core.target import Target
@@ -37,6 +39,22 @@ class Pedestrian(Position, Serializable):
         self._total_distance_moved: float = 0
         self._refund_distance_flag = False
         self._reached_target = False
+        self._waypoint: Waypoint|None = None
+
+    def set_waypoint(self, cell: Waypoint) -> None:
+        self._waypoint = cell
+
+    def get_waypoint(self) -> Waypoint:
+        return self._waypoint
+
+    def clear_waypoint(self) -> None:
+        self._waypoint = None
+
+    def has_reached_waypoint(self) -> bool:
+        return self._waypoint is not None and self._waypoint.get_cell().pos_equals(self)
+
+    def has_waypoint(self) -> bool:
+        return self._waypoint is not None
 
     def set_reached_target(self) -> None:
         self._reached_target = True

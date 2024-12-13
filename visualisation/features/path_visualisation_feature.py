@@ -40,6 +40,41 @@ class PathVisualisationFeature(VisualisationFeatureBase):
     def _describe_state(self) -> str:
         return f"Selected pedestrian: {'None' if self._selected_pedestrian is None else self._selected_pedestrian.get_id()}"
 
+    def _render_target(self, surface):
+        heatmap = self._selected_pedestrian.get_heatmap()
+        last_pos: Position = self._selected_pedestrian
+        visited: set[Position] = set()
+        visited.add(last_pos)
+        while last_pos is not None:
+            next_pos: Position = self._simulation._get_next_target_cell(heatmap, last_pos, last_pos)
+            if next_pos is None or next_pos in visited:
+                break
+
+            pygame.draw.line(surface, (255, 255, 255), self._helper.get_centered_pos_at(last_pos), self._helper.get_centered_pos_at(next_pos), 2)
+            if self._selected_pedestrian.get_target().is_inside_target(next_pos):
+                break
+
+            visited.add(next_pos)
+            last_pos = next_pos
+
+    def _render_waypoint(self, surface):
+        waypoint = self._selected_pedestrian.get_waypoint()
+        heatmap = waypoint.get_heatmap()
+        last_pos: Position = self._selected_pedestrian
+        visited: set[Position] = set()
+        visited.add(last_pos)
+        while last_pos is not None:
+            next_pos: Position = waypoint.next_cell(last_pos)
+            if next_pos is None or next_pos in visited:
+                break
+
+            pygame.draw.line(surface, (255, 255, 255), self._helper.get_centered_pos_at(last_pos), self._helper.get_centered_pos_at(next_pos), 2)
+            if waypoint.is_inside_waypoint(next_pos):
+                break
+
+            visited.add(next_pos)
+            last_pos = next_pos
+
     def _render(self, surface: Surface) -> None:
         if self._selected_pedestrian is not None:
             if self._selected_pedestrian.has_reached_target():
@@ -48,18 +83,7 @@ class PathVisualisationFeature(VisualisationFeatureBase):
 
             origin = self._helper.get_centered_pos_at(self._selected_pedestrian)
             pygame.draw.circle(surface, (255, 255, 255), origin, self._helper.get_cell_size() // 2, 2)
-            heatmap = self._selected_pedestrian.get_heatmap()
-            last_pos: Position = self._selected_pedestrian
-            visited: set[Position] = set()
-            visited.add(last_pos)
-            while last_pos is not None:
-                next_pos: Position = self._simulation._get_next_target_cell(heatmap, last_pos, last_pos)
-                if next_pos is None or next_pos in visited:
-                    break
-
-                pygame.draw.line(surface, (255, 255, 255), self._helper.get_centered_pos_at(last_pos), self._helper.get_centered_pos_at(next_pos), 3)
-                if self._selected_pedestrian.get_target().is_inside_target(next_pos):
-                    break
-
-                visited.add(next_pos)
-                last_pos = next_pos
+            if self._selected_pedestrian.has_waypoint():
+                self._render_waypoint(surface)
+            else:
+                self._render_target(surface)

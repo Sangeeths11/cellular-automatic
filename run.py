@@ -22,7 +22,7 @@ def get_cells(config, grid) -> Generator[Cell]:
                 yield grid.get_cell(x, y)
 
 def main():
-    simulation_config = SimulationConfigLoader.load_config("simulation_config\\chicken_test.json")
+    simulation_config = SimulationConfigLoader.load_config("simulation_config\\waypoint_test.json")
 
     neighbourhood_class = SimulationConfigLoader.get_neighbourhood_class(simulation_config["grid"]["neighbourhood"])
     grid = SimulationGrid(simulation_config["grid"]["width"], simulation_config["grid"]["height"], neighbourhood_class)
@@ -38,7 +38,7 @@ def main():
     target_mapping = {}
     for target_config in simulation_config["targets"]:
         target_cells = list(get_cells(target_config, grid))
-        blocked_states = SimulationConfigLoader.get_cell_states(target_config["cellstate"])
+        blocked_states = SimulationConfigLoader.get_cell_states(target_config.get("cellstate", None))
         heatmap_generator = SimulationConfigLoader.create_heatmap_generator(target_config["heatmap_generator"], distancing, blocked_states)
         target_obj = Target(target_config["name"], target_cells, grid, heatmap_generator)
         target_mapping[target_config["name"]] = target_obj
@@ -70,7 +70,10 @@ def main():
         list(target_mapping.values()),
         spawners,
         simulation_config["simulation"].get("occupation_bias_modifier", 1.0),
-        simulation_config["simulation"].get("retargeting_threshold", -1.0)
+        simulation_config["simulation"].get("retargeting_threshold", -1.0),
+        simulation_config["simulation"].get("waypoint_threshold", None),
+        simulation_config["simulation"].get("waypoint_distance", None),
+        SimulationConfigLoader.create_heatmap_generator(simulation_config["simulation"].get("waypoint_heatmap_generator", None), distancing, None)
     )
 
     vis = Visualisation(sim)

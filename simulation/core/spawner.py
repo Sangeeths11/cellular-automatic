@@ -51,9 +51,17 @@ class Spawner(Serializable):
         self._current_delay -= delta
         if self.can_spawn():
             self._current_delay = self._spawn_delay
-            if self._total_spawns is not None:
-                self._total_spawns -= 1
             yield from self.spawn()
+
+    def decrement_total_spawns(self) -> bool:
+        if self._total_spawns is not None:
+            if self._total_spawns > 0:
+                self._total_spawns -= 1
+                return True
+            else:
+                return False
+
+        return True
 
     def _get_target(self, cell) -> 'Target':
         if self._targeting_strategy == TargetingStrategy.RANDOM:
@@ -69,6 +77,9 @@ class Spawner(Serializable):
         free_cells = list([cell for cell in self._cells if cell.is_free()])
         random.shuffle(free_cells)
         for spawn_index in range(min(len(free_cells), self._batch_size)):
+            if self.decrement_total_spawns() is False:
+                break
+
             cell = free_cells[spawn_index]
             target = self._get_target(cell)
             speed = self.SPEED_DISTRIBUTION.sample()
