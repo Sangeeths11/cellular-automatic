@@ -24,13 +24,12 @@ class SocialDistancingHeatmapGenerator(HeatmapGeneratorBase):
         :param height: height of the social distancing force
         :param blocked: set of CellStates that are considered blocked, default is {CellState.OCCUPIED}
         """
-        super().__init__()
+        super().__init__( blocked or {CellState.OCCUPIED})
         self._distancing: DistanceBase = distancing
         self._width: float = width
         self._height: float = height
         self._neighbour_width: int = math.ceil(width / 2)
         self._neighbour_height: int = math.ceil(height / 2)
-        self._blocked: set[CellState] = blocked or {CellState.OCCUPIED}
         self._intensity: float = distancing.get_scale()
 
     def get_bias(self, center: Position, neighbour: Position):

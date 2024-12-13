@@ -56,6 +56,6 @@ class PedestrianVisualisationFeature(VisualisationFeatureBase):
                 pygame.draw.rect(surface, spawner_color, rect)
 
             if self._render_details:
-                speed_info = self._font.render(f"[{pedestrian.get_id()}] {pedestrian.get_average_speed():.2f}m/s, {pedestrian.get_optimal_speed():.2f}m/s", True, self._text_color)
+                speed_info = self._font.render(f"[{pedestrian.get_id()}] {pedestrian.get_average_speed():.2f}m/s, {pedestrian.get_optimal_speed():.2f}m/s, {pedestrian.get_current_distance():.2f}m", True, self._text_color)
                 text_pos = self._helper.get_x_center_pos_at(pedestrian, speed_info.get_height())
                 surface.blit(speed_info, speed_info.get_rect(center=text_pos))
