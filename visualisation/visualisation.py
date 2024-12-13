@@ -17,6 +17,7 @@ from visualisation.features.simulation_info_visualisation_feature import Simulat
 from visualisation.features.spawner_visualisation_feature import SpawnerVisualisationFeature
 from visualisation.features.target_heatmap_visualisation_feature import TargetHeatmapVisualisationFeature
 from visualisation.features.target_visualisation_feature import TargetVisualisationFeature
+from visualisation.features.waypoint_visualisation_feature import WaypointVisualisationFeature
 from visualisation.shortcut import Shortcut
 from visualisation.theme import Theme, DEFAULT_THEME
 from visualisation.toggle_button import ToggleButton
@@ -48,7 +49,7 @@ class Visualisation:
         self._helper = VisualisationHelper(self)
         self._shortcuts: dict[int, Shortcut] = {}
         self._features: list[VisualisationFeatureBase] = []
-        self._font = pygame.font.SysFont("Arial", int(self._cell_size * 0.75))
+        self._font = pygame.font.SysFont("Arial", min(int(self._cell_size * 0.5), 16))
         self._buttons: list[Button] = []
         self._click_theme = DEFAULT_THEME
         self._on_theme = Theme.create_theme((100, 250, 30))
@@ -102,6 +103,7 @@ class Visualisation:
         target = self.add_feature(TargetVisualisationFeature(self.simulation, self, self._helper))
         grid = self.add_feature(GridVisualisationFeature(self.simulation, self, self._helper))
         path = self.add_feature(PathVisualisationFeature(self.simulation, self, self._helper))
+        waypoint = self.add_feature(WaypointVisualisationFeature(self.simulation, self, self._helper))
         pedestrian = self.add_feature(PedestrianVisualisationFeature(self.simulation, self, self._helper))
         info = self.add_feature(SimulationInfoVisualisationFeature(self.simulation, self, self._helper), False)
         self.add_shortcut(Shortcut("Toggle heatmap", pygame.K_h, 0, heatmap.set_enabled, True, heatmap.is_enabled()), True, "Heatmap {0}")
@@ -113,9 +115,11 @@ class Visualisation:
         self.add_shortcut(Shortcut("Toggle social distancing", pygame.K_d, 0, heatmap.set_social_distancing, True, heatmap.get_social_distancing()), True, "Social distancing\n{0}")
         self.add_shortcut(Shortcut("Toggle route", pygame.K_r, 0, path.set_enabled, True, path.is_enabled()), True, "Pathing {0}")
         self.add_shortcut(Shortcut("Toggle grid lines", pygame.K_l, 0, grid.set_show_lines, True, grid.get_show_lines()), True, "Grid lines\n{0}")
+        self.add_shortcut(Shortcut("Toggle waypoint", pygame.K_w, 0, waypoint.set_enabled, True, waypoint.is_enabled()), True, "Waypoints {0}")
         self.add_shortcut(Shortcut("Show object names", pygame.K_n, 0, self._set_show_names, True, False), True, "Show names\n{0}")
         self.add_shortcut(Shortcut("Show pedestrian details", pygame.K_p, pygame.KMOD_LSHIFT, pedestrian.set_render_details, True, pedestrian.get_render_details()), True, "Pedestrian details\n{0}")
         self.add_shortcut(Shortcut("Show pedestrian target cell", pygame.K_p, pygame.KMOD_LCTRL, pedestrian.set_render_target_line, True, pedestrian.get_render_target_line()), True, "Pedestrian target\n{0}")
+        self.add_shortcut(Shortcut("Show pedestrian line", pygame.K_p, pygame.KMOD_LSHIFT, waypoint.set_show_pedestrian_line, True, waypoint.get_show_pedestrian_line()), True, "Waypoint pedestrian\nline: {0}")
         self.add_shortcut(Shortcut("Pause", pygame.K_SPACE, 0, self.set_pause, True, self.is_paused()), True, "Unpause", "Pause")
         self.add_shortcut(Shortcut("Next target", pygame.K_RIGHT, 0, heatmap.next_target, False), True, "Next target\nheatmap")
         self.add_shortcut(Shortcut("Previous target", pygame.K_LEFT, 0, heatmap.previous_target, False), True, "Previous target\nheatmap")

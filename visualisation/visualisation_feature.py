@@ -25,8 +25,8 @@ class VisualisationFeatureBase(ABC):
         self._text_color = (255, 255, 255)
         self._font_name = "Arial"
         self._mono_font_name = "Consolas"
-        self._small_font_size = int(self._helper.get_cell_size() * 0.35)
-        self._font_size = int(self._helper.get_cell_size() * 0.75)
+        self._small_font_size = min(int(self._helper.get_cell_size() * 0.35), 12)
+        self._font_size = min(int(self._helper.get_cell_size() * 0.75), 18)
         pass
 
     def enable(self) -> None:
