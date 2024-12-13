@@ -1,9 +1,11 @@
 from typing import Iterable
 
-import utils.utils
 from exceptions.simulation_error import SimulationError
 from exceptions.simulation_error_codes import SimulationErrorCode
-from serialization.serializable import Serializable
+from simulation.core.cell_state import CellState
+from simulation.heatmaps.djisktra_heatmap_generator import DijkstraHeatmapGenerator
+from utils.utils import none_check
+
 from simulation.core.cell import Cell
 from simulation.core.cell_state import CellState
 from simulation.core.position import Position
@@ -192,6 +194,7 @@ class Simulation(Serializable):
                 pedestrian.get_targeted_cell().set_pedestrian(pedestrian)
                 new_target_cell = self._get_next_pedestrian_target(pedestrian, cell)
                 pedestrian.set_target_cell(new_target_cell)
+
             elif pedestrian.has_targeted_cell() is False:
                 new_target_cell = self._get_next_pedestrian_target(pedestrian, pedestrian)
                 pedestrian.set_target_cell(new_target_cell)
