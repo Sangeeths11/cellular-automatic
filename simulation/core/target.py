@@ -1,6 +1,7 @@
 from exceptions.simulation_error import SimulationError
 from exceptions.simulation_error_codes import SimulationErrorCode
 from serialization.serializable import Serializable
+from simulation.core.cell_state import CellState
 from simulation.core.position import Position
 from utils import utils
 from typing import TYPE_CHECKING
