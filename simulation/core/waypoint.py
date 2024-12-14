@@ -10,7 +10,15 @@ if TYPE_CHECKING:
     from simulation.core.cell import Cell
 
 class Waypoint:
+    WAYPOINT_ID_COUNTER = 0
+
+    @staticmethod
+    def get_next_id() -> int:
+        Waypoint.WAYPOINT_ID_COUNTER += 1
+        return Waypoint.WAYPOINT_ID_COUNTER
+
     def __init__(self, heatmap_generator: HeatmapGeneratorBase, grid: SimulationGrid, cell: 'Cell', pedestrian: 'Pedestrian'):
+        self._id = Waypoint.get_next_id()
         self._heatmap_generator = heatmap_generator
         self._heatmap: Heatmap = None
         self._is_static_heatmap = CellState.OCCUPIED in heatmap_generator.get_blocked()
