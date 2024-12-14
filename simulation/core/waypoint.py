@@ -1,3 +1,5 @@
+import utils.utils
+from serialization.serializable import Serializable
 from simulation.core.cell_state import CellState
 from simulation.core.position import Position
 from simulation.core.simulation_grid import SimulationGrid
@@ -9,7 +11,7 @@ if TYPE_CHECKING:
     from simulation.core.pedestrian import Pedestrian
     from simulation.core.cell import Cell
 
-class Waypoint:
+class Waypoint(Serializable):
     WAYPOINT_ID_COUNTER = 0
 
     @staticmethod
@@ -49,3 +51,14 @@ class Waypoint:
 
     def is_inside_waypoint(self, pos: Position):
         return self._cell.pos_equals(pos)
+
+    def get_serialization_data(self) -> dict[str, any]:
+        return {
+            "id": self.get_identifier(),
+            "cell": self._cell.get_identifier(),
+            "pedestrian": self._pedestrian.get_identifier(),
+            "heatmap": utils.utils.heatmap_to_base64(self._heatmap)
+        }
+
+    def get_identifier(self) -> str:
+        return str(f"W_{self._id}")

@@ -1,11 +1,17 @@
+from typing import Iterable
+
 import utils.utils
+from exceptions.simulation_error import SimulationError
+from exceptions.simulation_error_codes import SimulationErrorCode
 from serialization.serializable import Serializable
 from simulation.core.cell import Cell
+from simulation.core.cell_state import CellState
 from simulation.core.position import Position
 from simulation.core.spawner import Spawner
 from simulation.core.target import Target
 from simulation.core.waypoint import Waypoint
 from simulation.heatmaps.distancing.base_distance import DistanceBase
+from simulation.heatmaps.djisktra_heatmap_generator import DijkstraHeatmapGenerator
 from simulation.heatmaps.heatmap import Heatmap
 from simulation.heatmaps.heatmap_generator_base import HeatmapGeneratorBase
 from simulation.heatmaps.pathfinding_queue import PathfindingQueue
@@ -14,7 +20,7 @@ from simulation.neighbourhood.base_neighbourhood import NeighbourhoodBase
 from simulation.core.pedestrian import Pedestrian
 from simulation.core.simulation_grid import SimulationGrid
 from utils.immutable_list import ImmutableList
-
+from utils.utils import none_check
 
 class Simulation(Serializable):
     def __init__(self, time_resolution: float, grid: SimulationGrid, distancing: DistanceBase,
@@ -216,10 +222,11 @@ class Simulation(Serializable):
     def get_serialization_data(self) -> dict[str, any]:
         return {
             "run_time": self._run_time,
-            "steps": self._steps,
+            "step": self._steps,
             "pedestrians": self._pedestrians,
             "targets": self._targets,
             "spawners": self._spawners,
+            "waypoints": self._waypoints,
             "social_distancing_heatmap": utils.utils.heatmap_to_base64(self._distancing_heatmap),
         }
 
