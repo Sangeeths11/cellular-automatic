@@ -9,7 +9,7 @@
       "name": "Spawner",
       "rect": [5, 5, 70, 45],
       "targets": ["upper-left-door", "upper-right-door", "lower-left-door", "lower-right-door"],
-      "total_spawns": 1,
+      "total_spawns": 1000,
       "batch_size": 1000,
       "spawn_delay": 1,
       "initial_delay": 0.0,
