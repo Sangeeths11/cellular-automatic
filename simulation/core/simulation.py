@@ -192,6 +192,7 @@ class Simulation(Serializable):
                 pedestrian.get_targeted_cell().set_pedestrian(pedestrian)
                 new_target_cell = self._get_next_pedestrian_target(pedestrian, cell)
                 pedestrian.set_target_cell(new_target_cell)
+
             elif pedestrian.has_targeted_cell() is False:
                 new_target_cell = self._get_next_pedestrian_target(pedestrian, pedestrian)
                 pedestrian.set_target_cell(new_target_cell)
