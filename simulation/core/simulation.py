@@ -45,6 +45,7 @@ class Simulation(Serializable):
         self._waypoint_heatmap_generator: HeatmapGeneratorBase | None = waypoint_heatmap_generator
         self._waypoints: list[Waypoint] = []
         self._waypoint_pathfinding_heatmap_generator: DijkstraHeatmapGenerator = DijkstraHeatmapGenerator(distancing, {CellState.OBSTACLE, CellState.OCCUPIED})
+        self._waypoint_heatmap_cache: dict[Target, Heatmap] = {}
 
         waypoint_none, none_fields = none_check(waypoint_threshold=waypoint_threshold, waypoint_distance=waypoint_distance, waypoint_heatmap_generator=waypoint_heatmap_generator)
         if waypoint_none is False:
@@ -160,8 +161,15 @@ class Simulation(Serializable):
         else:
             return self._get_next_target_cell(pedestrian.get_target().get_heatmap(), pedestrian, last_pos)
 
-    def _find_waypoint(self, cell: Cell, target: Iterable[Cell], depth: int = 10) -> Cell | None:
-        heatmap = self._waypoint_pathfinding_heatmap_generator.generate_heatmap(target, self._grid)
+
+    def _get_waypoint_heatmap(self, target: Target) -> Heatmap:
+        if target not in self._waypoint_heatmap_cache:
+            self._waypoint_heatmap_cache[target] = self._waypoint_heatmap_generator.generate_heatmap(target.get_cells(), self._grid)
+
+        return self._waypoint_heatmap_cache[target]
+
+    def _find_waypoint(self, cell: Cell, target: Target, depth: int = 10) -> Cell | None:
+        heatmap = self._get_waypoint_heatmap(target)
         queue = PathfindingQueue()
         queue.push(cell, heatmap.get_cell_at_pos(cell))
         current: Cell = cell
@@ -209,7 +217,7 @@ class Simulation(Serializable):
             elif (pedestrian.has_waypoint() is False and
                   self._waypoint_threshold is not None and
                   self._waypoint_threshold > pedestrian.get_current_distance() and
-                  (waypoint_target := self._find_waypoint(self._grid.get_cell_at_pos(pedestrian), pedestrian.get_target().get_cells())) is not None):
+                  (waypoint_target := self._find_waypoint(self._grid.get_cell_at_pos(pedestrian), pedestrian.get_target(), self._waypoint_distance)) is not None):
 
                 self._create_waypoint(waypoint_target, pedestrian)
             else:
@@ -219,6 +227,7 @@ class Simulation(Serializable):
 
 
     def _update_waypoints(self):
+        self._waypoint_heatmap_cache.clear()
         for waypoint in self._waypoints:
             waypoint.update()
 
