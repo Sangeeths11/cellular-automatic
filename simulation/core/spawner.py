@@ -48,10 +48,11 @@ class Spawner(Serializable):
         return self._total_spawns == 0
 
     def update(self, delta: float) -> Generator[Pedestrian]:
-        self._current_delay -= delta
-        if self.can_spawn():
-            self._current_delay = self._spawn_delay
-            yield from self.spawn()
+        if not self.is_done():
+            self._current_delay -= delta
+            if self.can_spawn():
+                self._current_delay = self._spawn_delay
+                yield from self.spawn()
 
     def decrement_total_spawns(self) -> bool:
         if self._total_spawns is not None:
