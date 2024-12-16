@@ -359,8 +359,8 @@ simulation.
 | `utils`                                        | Contains utility functions used throughout the simulation                                                                           |
 
 <h4 id="architecture/overview">Overview over all classes and their inheritance</h4>
-![Class Diagram](.docs/module_class_overview.png)
 
+<img src=".docs/module_class_overview.png" alt="Class Diagram" width="100%"/>
 
 <h4 id="architecture/exceptions">Exceptions Module</h4>
 
