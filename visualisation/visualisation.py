@@ -30,7 +30,7 @@ from visualisation.visualisation_helper import VisualisationHelper
 class Visualisation:
     GRID_OFFSET = 200
 
-    def __init__(self, simulation: Simulation, cell_size: int | None = None, fps: float = 30):
+    def __init__(self, simulation: Simulation, cell_size: int | None = None, fps: float = 30, log_file: str = None):
         pygame.init()
         simulation.update(0) # Update simulation once to get the initial state
         self.simulation = simulation
@@ -61,7 +61,7 @@ class Visualisation:
         self._show_feature_details = self._screen.get_width() > 800
         self._show_buttons = True
         self._init_features()
-        self._serializer = Serializer(simulation, f"simulation-{datetime.datetime.now().strftime("%d%m%y_%H%M%S")}.json")
+        self._serializer = Serializer(simulation, log_file.format(datetime.datetime.now().strftime("%d%m%y_%H%M%S"))) if log_file is not None else None
 
     TFeature = TypeVar('TFeature', bound=VisualisationFeatureBase)
 
@@ -213,7 +213,8 @@ class Visualisation:
             if self._simulation_delta >= self.simulation.get_time_resolution():
                 self.simulation.update(self._simulation_delta)
                 self._simulation_delta = 0
-                self._serializer.write_current_state()
+                if self._serializer is not None:
+                    self._serializer.write_current_state()
 
 
     def render_features(self, surface) -> None:

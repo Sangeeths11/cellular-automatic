@@ -76,7 +76,8 @@ def main():
         SimulationConfigLoader.create_heatmap_generator(simulation_config["simulation"].get("waypoint_heatmap_generator", None), distancing, None)
     )
 
-    vis = Visualisation(sim)
+    log_file = simulation_config.get("log_file", None)
+    vis = Visualisation(sim, None, 30.0, log_file)
     vis.run()
 
 
