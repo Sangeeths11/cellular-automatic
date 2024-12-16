@@ -22,7 +22,7 @@ def get_cells(config, grid) -> Generator[Cell]:
                 yield grid.get_cell(x, y)
 
 def main():
-    simulation_config = SimulationConfigLoader.load_config("simulation_config\\rimea_test_9.json")
+    simulation_config = SimulationConfigLoader.load_config("simulation_config\\chicken_test.json")
 
     neighbourhood_class = SimulationConfigLoader.get_neighbourhood_class(simulation_config["grid"]["neighbourhood"])
     grid = SimulationGrid(simulation_config["grid"]["width"], simulation_config["grid"]["height"], neighbourhood_class)

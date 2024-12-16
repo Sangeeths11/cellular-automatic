@@ -2,7 +2,6 @@ from exceptions.simulation_error import SimulationError
 from exceptions.simulation_error_codes import SimulationErrorCode
 from simulation.core.cell_state import CellState
 from serialization.serializable import Serializable
-from simulation.core.cell_state import CellState
 from simulation.core.position import Position
 from utils import utils
 from typing import TYPE_CHECKING
@@ -67,7 +66,7 @@ class Target(Serializable):
         }
 
         if not self._is_static_heatmap:
-            data['heatmap'] = utils.heatmap_to_base64(self._heatmap)
+            data["heatmap"] = utils.heatmap_to_base64(self._heatmap)
 
         return data
 

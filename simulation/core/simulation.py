@@ -6,6 +6,12 @@ from simulation.core.cell_state import CellState
 from simulation.heatmaps.djisktra_heatmap_generator import DijkstraHeatmapGenerator
 from utils.utils import none_check
 
+from typing import Iterable
+
+import utils.utils
+from exceptions.simulation_error import SimulationError
+from exceptions.simulation_error_codes import SimulationErrorCode
+from serialization.serializable import Serializable
 from simulation.core.cell import Cell
 from simulation.core.cell_state import CellState
 from simulation.core.position import Position
@@ -27,7 +33,7 @@ from utils.utils import none_check
 class Simulation(Serializable):
     def __init__(self, time_resolution: float, grid: SimulationGrid, distancing: DistanceBase,
                  social_distancing: SocialDistancingHeatmapGenerator, targets: list[Target], spawners: list[Spawner],
-                 occupation_bias_modifier: float | None = 1.0, retargeting_threshold: float | None = -1.0, waypoint_threshold: float | None = None, waypoint_distance: int | None = None, waypoint_heatmap_generator: HeatmapGeneratorBase | None = None):
+                 occupation_bias_modifier: float | None = 1.0, retargeting_threshold: float | None = -1.0):
         self._pedestrians: list[Pedestrian] = list()
         self._grid: SimulationGrid = grid
         self._targets: list[Target] = targets
