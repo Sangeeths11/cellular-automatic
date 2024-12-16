@@ -1,5 +1,6 @@
 from exceptions.simulation_error import SimulationError
 from exceptions.simulation_error_codes import SimulationErrorCode
+from simulation.core.cell_state import CellState
 from serialization.serializable import Serializable
 from simulation.core.position import Position
 from utils import utils
@@ -21,6 +22,7 @@ class Target(Serializable):
         self._grid: 'SimulationGrid' = grid
         self._heatmap: 'Heatmap'|None = None
         self._exit_count: int = 0
+        self._is_static_heatmap: bool = CellState.OCCUPIED not in heatmap_generator.get_blocked()
 
     def get_name(self) -> str:
         return self._name
@@ -35,7 +37,8 @@ class Target(Serializable):
         return self._heatmap
 
     def update_heatmap(self) -> None:
-        self._heatmap = self._heatmap_generator.generate_heatmap(self._cells, self._grid)
+        if self._is_static_heatmap is False or self._heatmap is None:
+            self._heatmap = self._heatmap_generator.generate_heatmap(self._cells, self._grid)
 
     def increment_exit_count(self) -> None:
         self._exit_count += 1
@@ -56,11 +59,16 @@ class Target(Serializable):
         return False
 
     def get_serialization_data(self) -> dict[str, any]:
-        return {
+        data = {
             "id": self.get_identifier(),
             "exit_count": self._exit_count,
             #"heatmap": utils.heatmap_to_base64(self._heatmap)
         }
+
+        if not self._is_static_heatmap:
+            data["heatmap"] = utils.heatmap_to_base64(self._heatmap)
+
+        return data
 
     def get_identifier(self) -> str:
         return self._name

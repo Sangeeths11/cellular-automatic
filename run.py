@@ -38,7 +38,7 @@ def main():
     target_mapping = {}
     for target_config in simulation_config["targets"]:
         target_cells = list(get_cells(target_config, grid))
-        blocked_states = SimulationConfigLoader.get_cell_states(target_config["cellstate"])
+        blocked_states = SimulationConfigLoader.get_cell_states(target_config.get("cellstate", None))
         heatmap_generator = SimulationConfigLoader.create_heatmap_generator(target_config["heatmap_generator"], distancing, blocked_states)
         target_obj = Target(target_config["name"], target_cells, grid, heatmap_generator)
         target_mapping[target_config["name"]] = target_obj
@@ -70,10 +70,14 @@ def main():
         list(target_mapping.values()),
         spawners,
         simulation_config["simulation"].get("occupation_bias_modifier", 1.0),
-        simulation_config["simulation"].get("retargeting_threshold", -1.0)
+        simulation_config["simulation"].get("retargeting_threshold", -1.0),
+        simulation_config["simulation"].get("waypoint_threshold", None),
+        simulation_config["simulation"].get("waypoint_distance", None),
+        SimulationConfigLoader.create_heatmap_generator(simulation_config["simulation"].get("waypoint_heatmap_generator", None), distancing, None)
     )
 
-    vis = Visualisation(sim)
+    log_file = simulation_config.get("log_file", None)
+    vis = Visualisation(sim, None, 30.0, log_file)
     vis.run()
 
 
