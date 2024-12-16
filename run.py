@@ -1,3 +1,4 @@
+import sys
 from typing import Generator
 
 from simulation.core.cell import Cell
@@ -21,8 +22,8 @@ def get_cells(config, grid) -> Generator[Cell]:
             for y in range(y1, y2 + 1):
                 yield grid.get_cell(x, y)
 
-def main():
-    simulation_config = SimulationConfigLoader.load_config("simulation_config\\chicken_test.json")
+def main(config_path):
+    simulation_config = SimulationConfigLoader.load_config(config_path)
 
     neighbourhood_class = SimulationConfigLoader.get_neighbourhood_class(simulation_config["grid"]["neighbourhood"])
     grid = SimulationGrid(simulation_config["grid"]["width"], simulation_config["grid"]["height"], neighbourhood_class)
@@ -82,4 +83,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1])

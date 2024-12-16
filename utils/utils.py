@@ -54,11 +54,11 @@ def heatmap_from_bytes(data: bytes) -> Heatmap:
     :param data: byte array
     :return: heatmap
     """
-    struct_fmt = 'II'
+    struct_fmt = '<I<I'
     header_size = struct.calcsize(struct_fmt)
     width, height = struct.unpack(struct_fmt, data[:header_size])
     cell_count = width * height
-    struct_fmt += 'd' * cell_count
+    struct_fmt += '<d' * cell_count
     cells = struct.unpack(struct_fmt, data[header_size:])
     heatmap = Heatmap(width, height)
     heatmap.cells = list(cells)

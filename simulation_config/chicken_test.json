@@ -49,5 +49,6 @@
   "distancing": {
     "type": "EuclideanDistance",
     "scale": 0.5
-  }
+  },
+  "log_file": "chicken_test_{0}.json"
 }

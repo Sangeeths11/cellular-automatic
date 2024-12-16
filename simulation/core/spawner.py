@@ -20,9 +20,8 @@ if TYPE_CHECKING:
 
 
 class Spawner(Serializable):
-    # clipping is chosen at random
-    # TODO: choose better value based on scientific research
-    SPEED_DISTRIBUTION = ClippedNormalDistribution(1.34, 0.26, 0.1, 3.0)
+    # Chosen by values from this paper: https://ieeexplore.ieee.org/document/6977742
+    SPEED_DISTRIBUTION = ClippedNormalDistribution(1.34, 0.26, 0.69, 2.45)
 
     def __init__(self, name: str, distancing: 'DistanceBase', cells: list['Cell'], targets: list['Target'], total_spawns: int | None, batch_size: int | None, spawn_delay: float, initial_delay: float, targeting_strategy: TargetingStrategy = TargetingStrategy.RANDOM):
         self._name: str = name
