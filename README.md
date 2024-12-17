@@ -539,7 +539,7 @@ pytest tests
 
 <h3 id="testing/coverage">Testing Coverage</h3>
 
-All no mentioned modules aren't covered at all.
+Overview over which modules tests are already implemented for. All no mentioned modules aren't covered at all.
 
 | Module                              | File                                     | Implemented |
 |-------------------------------------|------------------------------------------|-------------|
