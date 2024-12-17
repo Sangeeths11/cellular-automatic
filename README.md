@@ -40,7 +40,7 @@
 [4.1.4.4 Position](#architecture/simulation/core/position) \
 [4.1.4.5 Waypoint](#architecture/simulation/core/waypoint)
 
-[5. Testing](#section/testing)
+[5. Testing](#section/testing) \
 [5.1 Testing Coverage](#testing/coverage)
 
 
