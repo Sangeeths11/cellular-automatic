@@ -2,9 +2,7 @@
 
 ## Table of Contents
 
-
-
-[1. Overview](#overview) 
+[1. Overview](#overview)
 
 [2. Configuration](#section/configuration) \
 [2.1 Configuration Types](#configuration/types) \
@@ -22,12 +20,12 @@
 [2.2.3 Distancing Algorithm Type](#configuration/implementations/distancing-algorithm-type) \
 [2.3 Configuration Enums](#configuration/enums) \
 [2.3.1 Cell State](#configuration/enums/cell-state) \
-[2.3.2 TargetingStrategy Type](#configuration/enums/targeting-type) 
+[2.3.2 TargetingStrategy Type](#configuration/enums/targeting-type)
 
 [3. Visualisation](#section/visualisation) \
 [3.1 Visualisation Features](#visualisation/features) \
 [3.2 Keyboard Shortcuts](#visualisation/keyboard-shortcuts) \
-[3.3 Mouse Interaction](#visualisation/mouse-interaction) 
+[3.3 Mouse Interaction](#visualisation/mouse-interaction)
 
 [4. Architecture](#architecture) \
 [4.1 Modules](#architecture/modules) \
@@ -40,8 +38,9 @@
 [4.1.4.2 Spawner](#architecture/simulation/core/spawner) \
 [4.1.4.3 Target](#architecture/simulation/core/target) \
 [4.1.4.4 Position](#architecture/simulation/core/position) \
-[4.1.4.5 Waypoint](#architecture/simulation/core/waypoint) 
+[4.1.4.5 Waypoint](#architecture/simulation/core/waypoint)
 
+[5. Testing](#section/testing)
 
 
 <h2 id="overview"> Overview</h2>
@@ -56,17 +55,17 @@ overview of the visualisation.
 
 The configuration is split into the following sections
 
-| Field               | Type                                                        | Required | Default | Description                                                                                                                                 |
-|---------------------|-------------------------------------------------------------|----------|---------|---------------------------------------------------------------------------------------------------------------------------------------------|
-| `grid`              | [`Grid`](#configuration/types/grid-type)                          | Yes      | -       | Configuration of the simulation grid                                                                                                        |
-| `neighbourhood`     | [`NeighbourhoodType`](#configuration/implementations/neighbourhood-type)    | Yes      | -       | Which algorithm to use to get neighbouring cells                                                                                            |
-| `obstacles`         | [`Obstacle[]`](#configuration/types/obstacle-type)                | No       | null    | An array of obstacles                                                                                                                       |
-| `spawners`          | [`Spawner[]`](#configuration/types/spawner-type)                  | Yes      | -       | An array of spawners                                                                                                                        |
-| `targets`           | [`Target[]`](#configuration/types/target-type)                    | Yes      | -       | An array of target cells                                                                                                                    |
-| `social_distancing` | [`SocialDistancing`](#configuration/types/social-distancing-type) | Yes      | -       | Configuration of social distancing rules                                                                                                    |
-| `distancing`        | [`Distancing`](#configuration/types/distancing-type)              | Yes      | -       | Configuration of social distancing rules                                                                                                    |
-| `simulation`        | [`Simulation`](#configuration/types/simulation-type)              | Yes      | -       | Configuration of the simulation                                                                                                             |
-| `log_file`          | `string\|null`                                              | No       | null    | The path to a file to log the simulation data step-wise. `{0}` will be formated with the current date. If set to `null` logging is disabled |
+| Field               | Type                                                                     | Required | Default | Description                                                                                                                                 |
+|---------------------|--------------------------------------------------------------------------|----------|---------|---------------------------------------------------------------------------------------------------------------------------------------------|
+| `grid`              | [`Grid`](#configuration/types/grid-type)                                 | Yes      | -       | Configuration of the simulation grid                                                                                                        |
+| `neighbourhood`     | [`NeighbourhoodType`](#configuration/implementations/neighbourhood-type) | Yes      | -       | Which algorithm to use to get neighbouring cells                                                                                            |
+| `obstacles`         | [`Obstacle[]`](#configuration/types/obstacle-type)                       | No       | null    | An array of obstacles                                                                                                                       |
+| `spawners`          | [`Spawner[]`](#configuration/types/spawner-type)                         | Yes      | -       | An array of spawners                                                                                                                        |
+| `targets`           | [`Target[]`](#configuration/types/target-type)                           | Yes      | -       | An array of target cells                                                                                                                    |
+| `social_distancing` | [`SocialDistancing`](#configuration/types/social-distancing-type)        | Yes      | -       | Configuration of social distancing rules                                                                                                    |
+| `distancing`        | [`Distancing`](#configuration/types/distancing-type)                     | Yes      | -       | Configuration of social distancing rules                                                                                                    |
+| `simulation`        | [`Simulation`](#configuration/types/simulation-type)                     | Yes      | -       | Configuration of the simulation                                                                                                             |
+| `log_file`          | `string\|null`                                                           | No       | null    | The path to a file to log the simulation data step-wise. `{0}` will be formated with the current date. If set to `null` logging is disabled |
 
 Example Configuration:
 
@@ -127,18 +126,19 @@ Example Configuration:
 
 <h4 id="configuration/types/simulation-type">Simulation Type</h4>
 
-| Field                        | Type                                                            | Required | Default | Description                                                                                                                                                                                                               |
-|------------------------------|-----------------------------------------------------------------|----------|---------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `time_resolution`            | `float`                                                         | Yes      | -       | The minimum amount of time between simulation steps in seconds                                                                                                                                                            |
-| `occupation_bias_modifier`   | `float\|null`                                                   | No       | 1.0     | A factor which is multiplied with the occupation bias of a cell higher values mean the cell is less favourable as a next target. If set to `null` pedestrians cannot target cells which are `OCCUPIED`                    |
-| `retargeting_threshold`      | `float\|null`                                                   | No       | -1.0    | The threshold in virtual moved meters at which a pedestrian will retarget to another cell which is not occupied                                                                                                           |
-| `waypoint_threshold`         | `float\|null`                                                   | No       | -       | The threshold in virtual moved meters at which a pedestrian will retarget to a waypoint. Waypoints are a cheaper alternative to recalculating the target heatmap each simulation tick. Set to `null` to disable Waypoints |
-| `waypoint_distance`          | `int`                                                           | No*      | -       | The depth for pathfinding to select a waypoint                                                                                                                                                                            |
+| Field                        | Type                                                                            | Required | Default | Description                                                                                                                                                                                                               |
+|------------------------------|---------------------------------------------------------------------------------|----------|---------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `time_resolution`            | `float`                                                                         | Yes      | -       | The minimum amount of time between simulation steps in seconds                                                                                                                                                            |
+| `occupation_bias_modifier`   | `float\|null`                                                                   | No       | 1.0     | A factor which is multiplied with the occupation bias of a cell higher values mean the cell is less favourable as a next target. If set to `null` pedestrians cannot target cells which are `OCCUPIED`                    |
+| `retargeting_threshold`      | `float\|null`                                                                   | No       | -1.0    | The threshold in virtual moved meters at which a pedestrian will retarget to another cell which is not occupied                                                                                                           |
+| `waypoint_threshold`         | `float\|null`                                                                   | No       | -       | The threshold in virtual moved meters at which a pedestrian will retarget to a waypoint. Waypoints are a cheaper alternative to recalculating the target heatmap each simulation tick. Set to `null` to disable Waypoints |
+| `waypoint_distance`          | `int`                                                                           | No*      | -       | The depth for pathfinding to select a waypoint                                                                                                                                                                            |
 | `waypoint_heatmap_generator` | [`HeatmapGeneratorType`](#configuration/implementations/heatmap-generator-type) | No*      | -       | The type of heatmap generator to use for pathfinding to a waypoint, cellstate will be set to `[OBSTACLE]`                                                                                                                 |
 
 *Only if `waypoint_threshold` is set
 
 Example Simulation Configuration:
+
 ```json
 {
   "time_resolution": 0.1,
@@ -152,21 +152,21 @@ Example Simulation Configuration:
 
 <h4 id="configuration/types/grid-type">Grid Type</h4>
 
-| Field           | Type                                                     | Required | Default | Description                                      |
-|-----------------|----------------------------------------------------------|----------|---------|--------------------------------------------------|
-| `width`         | `int`                                                    | Yes      | -       | The width of the simulation grid                 |
-| `height`        | `int`                                                    | Yes      | -       | The height of the simulation grid                |
+| Field           | Type                                                                     | Required | Default | Description                                      |
+|-----------------|--------------------------------------------------------------------------|----------|---------|--------------------------------------------------|
+| `width`         | `int`                                                                    | Yes      | -       | The width of the simulation grid                 |
+| `height`        | `int`                                                                    | Yes      | -       | The height of the simulation grid                |
 | `neighbourhood` | [`NeighbourhoodType`](#configuration/implementations/neighbourhood-type) | Yes      | -       | Which algorithm to use to get neighbouring cells |
 
 <h4 id="configuration/types/target-type">Target Type</h4>
 
-| Field               | Type                                                            | Required | Default      | Description                                                                                                                                                                                                                           |
-|---------------------|-----------------------------------------------------------------|----------|--------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `name`              | `string`                                                        | Yes      | -            | A unique name of the target                                                                                                                                                                                                           |
-| `rect`              | `int[]`                                                         | No*      | -            | An array with exactly 4 entries `[x1, y1, x2, y2]` which spans an rectangle betwen `(x1, y1)` and `(x2, y2)`                                                                                                                          |
-| `cells`             | [`Cell[]`](#configuration/types/cell-type)                            | No*      | -            | An array of cells that are part of the obstacle. Each cell is represented by a single integer.                                                                                                                                        |
-| `cellstate`         | [`CellState[]`](#configuration/enums/cell-state)                      | No       | `[OBSTACLE]` | A list of [`CellState`](#configuration/enums/cell-state) which are considered blocked by the pathfinding algorithm. Pathfinding only gets updated each simulation step if any of the [`CellState`](#configuration/enums/cell-state) is not static |
-| `heatmap_generator` | [`HeatmapGeneratorType`](#configuration/implementations/heatmap-generator-type) | Yes      | -            | The type of heatmap generator to use for pathfinding for this target                                                                                                                                                                  |
+| Field               | Type                                                                            | Required | Default      | Description                                                                                                                                                                                                                                       |
+|---------------------|---------------------------------------------------------------------------------|----------|--------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `name`              | `string`                                                                        | Yes      | -            | A unique name of the target                                                                                                                                                                                                                       |
+| `rect`              | `int[]`                                                                         | No*      | -            | An array with exactly 4 entries `[x1, y1, x2, y2]` which spans an rectangle betwen `(x1, y1)` and `(x2, y2)`                                                                                                                                      |
+| `cells`             | [`Cell[]`](#configuration/types/cell-type)                                      | No*      | -            | An array of cells that are part of the obstacle. Each cell is represented by a single integer.                                                                                                                                                    |
+| `cellstate`         | [`CellState[]`](#configuration/enums/cell-state)                                | No       | `[OBSTACLE]` | A list of [`CellState`](#configuration/enums/cell-state) which are considered blocked by the pathfinding algorithm. Pathfinding only gets updated each simulation step if any of the [`CellState`](#configuration/enums/cell-state) is not static |
+| `heatmap_generator` | [`HeatmapGeneratorType`](#configuration/implementations/heatmap-generator-type) | Yes      | -            | The type of heatmap generator to use for pathfinding for this target                                                                                                                                                                              |
 
 *either `rect` or `cells` must be present
 
@@ -183,16 +183,16 @@ Example Target Configuration with `rect`:
 
 <h4 id="configuration/types/spawner-type">Spawner Type</h4>
 
-| Field           | Type                                             | Required | Default  | Description                                                                                                  |
-|-----------------|--------------------------------------------------|----------|----------|--------------------------------------------------------------------------------------------------------------|
-| `name`          | `string`                                         | Yes      | -        | A unique name of the spawner                                                                                 |
-| `rect`          | `int[]`                                          | No*      | -        | An array with exactly 4 entries `[x1, y1, x2, y2]` which spans an rectangle betwen `(x1, y1)` and `(x2, y2)` |
+| Field           | Type                                                   | Required | Default  | Description                                                                                                  |
+|-----------------|--------------------------------------------------------|----------|----------|--------------------------------------------------------------------------------------------------------------|
+| `name`          | `string`                                               | Yes      | -        | A unique name of the spawner                                                                                 |
+| `rect`          | `int[]`                                                | No*      | -        | An array with exactly 4 entries `[x1, y1, x2, y2]` which spans an rectangle betwen `(x1, y1)` and `(x2, y2)` |
 | `cells`         | [`Cell[]`](#configuration/types/cell-type)             | No*      | -        | An array of cells that are part of the obstacle. Each cell is represented by a single integer.               |
-| `targets`       | `str[]`                                          | Yes      | -        | An array of target names that the pedestrians spawned by this spawner can walk to                            |
-| `total_spawns`  | `int\|null`                                      | Yes      | -        | The total number of pedestrians to spawn. Use `null` for unlimited spawning                                  |
-| `batch_size`    | `int`                                            | Yes      | -        | The maximum amount of pedestrians to spawn in each spawn attempt                                             |
-| `spawn_delay`   | `float`                                          | Yes      | -        | The delay in seconds between each spawn attempt                                                              |
-| `initial_delay` | `float`                                          | Yes      | -        | The delay in seconds before the first spawn attempt after the simulation started                             |
+| `targets`       | `str[]`                                                | Yes      | -        | An array of target names that the pedestrians spawned by this spawner can walk to                            |
+| `total_spawns`  | `int\|null`                                            | Yes      | -        | The total number of pedestrians to spawn. Use `null` for unlimited spawning                                  |
+| `batch_size`    | `int`                                                  | Yes      | -        | The maximum amount of pedestrians to spawn in each spawn attempt                                             |
+| `spawn_delay`   | `float`                                                | Yes      | -        | The delay in seconds between each spawn attempt                                                              |
+| `initial_delay` | `float`                                                | Yes      | -        | The delay in seconds before the first spawn attempt after the simulation started                             |
 | `targeting`     | [`TargetingType`](#configuration/enums/targeting-type) | No       | `RANDOM` | How to pick a target for a newly spawned pedestrian                                                          |
 
 *either `rect` or `cells` must be present
@@ -214,10 +214,10 @@ Example Spawner Configuration with `rect`:
 
 <h4 id="configuration/types/obstacle-type">Obstacle Type</h4>
 
-| Field   | Type                                 | Required | Default | Description                                                                                                  |
-|---------|--------------------------------------|----------|---------|--------------------------------------------------------------------------------------------------------------|
-| `name`  | `string`                             | Yes      | -       | A unique name of the obstacle                                                                                |
-| `rect`  | `int[]`                              | No*      | -       | An array with exactly 4 entries `[x1, y1, x2, y2]` which spans an rectangle betwen `(x1, y1)` and `(x2, y2)` |
+| Field   | Type                                       | Required | Default | Description                                                                                                  |
+|---------|--------------------------------------------|----------|---------|--------------------------------------------------------------------------------------------------------------|
+| `name`  | `string`                                   | Yes      | -       | A unique name of the obstacle                                                                                |
+| `rect`  | `int[]`                                    | No*      | -       | An array with exactly 4 entries `[x1, y1, x2, y2]` which spans an rectangle betwen `(x1, y1)` and `(x2, y2)` |
 | `cells` | [`Cell[]`](#configuration/types/cell-type) | No*      | -       | An array of cells that are part of the obstacle. Each cell is represented by a single integer.               |
 
 *either `rect` or `cells` must be present
@@ -266,10 +266,10 @@ $$
 
 <h4 id="configuration/types/distancing-type">Distancing Type</h4>
 
-| Field   | Type                                                         | Required | Default | Description                                  |
-|---------|--------------------------------------------------------------|----------|---------|----------------------------------------------|
+| Field   | Type                                                                         | Required | Default | Description                                  |
+|---------|------------------------------------------------------------------------------|----------|---------|----------------------------------------------|
 | `type`  | [`DistancingType`](#configuration/implementations/distancing-algorithm-type) | Yes      | -       | The type of social distancing to apply       |
-| `scale` | `float`                                                      | Yes      | -       | The distance in meters of two adjacent cells |
+| `scale` | `float`                                                                      | Yes      | -       | The distance in meters of two adjacent cells |
 
 Example Distancing Configuration:
 
@@ -315,6 +315,7 @@ Different implementations of algorithms needed in the simulation can be selected
 | `TaxiDistance`      | The Manhattan distance between two cells |
 
 ### Configuration Enums
+
 <h3 id="configuration/enums">Configuration Enums</h3>
 
 Different enums are used throughout the configuration to select from a predefined set of values.
@@ -464,7 +465,7 @@ This module contains the core simulation logic, such as the simulation loop and 
 | `simulation.py`                                             | Contains the `Simulation` class which represents the complete simulation and core loop of the simulation                                                                                                                                                                   |
 | `spawner.py`                                                | Contains the `Spawner` class which handles the logic for [`Pedestrian`](#architecture/simulation/core/pedestrian) creation                                                                                                                                                 |
 | `target.py`                                                 | Contains the `Target` class which represents a target a [`Pedestrian`](#architecture/simulation/core/pedestrian) can walk to and exit the simulation. This class contains all cells which belong to the target and handles the generation of it's navigation heatmap       |
-| `targeting_strategy`                                        | Contains the [`TargetingStrategy`](#configuration/enums/targeting-type) enum                                                                                                                                                                                                     |
+| `targeting_strategy`                                        | Contains the [`TargetingStrategy`](#configuration/enums/targeting-type) enum                                                                                                                                                                                               |
 | `waypoint.py`                                               | Contains the `Waypoint` class which represents a waypoint a [`Pedestrian`](#architecture/simulation/core/pedestrian) can walk to and exit the simulation. This class contains the cell where the waypoint is located and handles the generation of it's navigation heatmap |
 
 <h5 id="architecture/simulation/core/pedestrian">Pedestrian</h5>
@@ -494,9 +495,11 @@ Spawning happens in batches where the size is the minimum of `batch_size` and th
 <h5 id="architecture/simulation/core/target">Target</h5>
 
 The [`Target`](#architecture/simulation/core/target) class handles the generation of the navigation heatmap for the
-target. The heatmap is generated by the selected [`HeatmapGenerator`](#configuration/implementations/heatmap-generator-type) and is
+target. The heatmap is generated by the selected [
+`HeatmapGenerator`](#configuration/implementations/heatmap-generator-type) and is
 updated either at the beginning of the simulation or every simulation tick if it also considers [
-`OCCUPIED`](#configuration/enums/cell-state) as blocked. The heatmap is used by the pedestrians to find the shortest path to
+`OCCUPIED`](#configuration/enums/cell-state) as blocked. The heatmap is used by the pedestrians to find the shortest
+path to
 the target. The target also contains the cells and a method `is_inside_target` to check if a [
 `Position`](#architecture/simulation/core/position) is inside of one of the target's cells.
 
@@ -509,9 +512,11 @@ compare different implementations of `Position` only by `x` and `y` coordinate.
 <h5 id="architecture/simulation/core/waypoint">Waypoint</h5>
 
 The [`Waypoint`](#architecture/simulation/core/waypoint) class handles the generation of the navigation heatmap for the
-waypoint. The heatmap is generated by the selected [`HeatmapGenerator`](#configuration/implementations/heatmap-generator-type) and is
+waypoint. The heatmap is generated by the selected [
+`HeatmapGenerator`](#configuration/implementations/heatmap-generator-type) and is
 updated either at the beginning of the simulation or every simulation tick if it also considers [
-`OCCUPIED`](#configuration/enums/cell-state) as blocked. The waypoint is used by the pedestrians to find the shortest path to
+`OCCUPIED`](#configuration/enums/cell-state) as blocked. The waypoint is used by the pedestrians to find the shortest
+path to
 the waypoint. The waypoint also contains the cell and a method `is_inside_waypoint` to check if a [
 `Position`](#architecture/simulation/core/position) is inside of the waypoint's cell. A waypoint is only created when
 the simulations `waypoint_threshold` is set and the pedestrian couldn't move for longer than the threshold. A [
@@ -522,3 +527,41 @@ location towards it's target. Once a pedestrian has a set [`Waypoint`](#architec
 first walk to it's waypoint before continuing to it's original target. Waypoints mainly should prevent pedestrians
 getting stuck in narrow corridors.
 
+<h2 id="section/testing">Testing</h2>
+
+The project is tested with `pytest`. The tests are located in the `tests` directory and can be run with the following
+Currently the tests only cover the core components of the simulations and parts of it's logic due to time constraints.
+
+```shell
+pytest tests
+```
+
+<h3 id="testing/coverage">Testing Coverage</h3>
+
+All no mentioned modules aren't covered at all.
+
+| Module                              | File                                     | Implemented |
+|-------------------------------------|------------------------------------------|-------------|
+| `simulation/core`                   | `cell.py`                                | Yes         |
+| `simulation/core`                   | `cell_state.py`                          | Yes         |
+| `simulation/core`                   | `grid_base.py`                           | Yes         |
+| `simulation/core`                   | `pedestrian.py`                          | Yes         |
+| `simulation/core`                   | `position.py`                            | Yes         |
+| `simulation/core`                   | `simulation.py`                          | No          |
+| `simulation/core`                   | `simulation_grid.py`                     | Yes         |
+| `simulation/core`                   | `spawner.py`                             | Yes         |
+| `simulation/core`                   | `target.py`                              | Yes         |
+| `simulation/core`                   | `waypoint.py`                            | No          |
+| `simulation/core`                   | `targeting_strategy.py`                  | No          |
+| `simulation/heatmaps`               | `dijkstra_heatmap_generator.py`          | Yes         |
+| `simulation/heatmaps`               | `fast_marching_heatmap_generator.py`     | Yes         |
+| `simulation/heatmaps`               | `social_distancing_heatmap_generator.py` | Yes         |
+| `simulation/heatmaps`               | `pathfinding_queue.py`                   | No          |
+| `simulation/heatmaps`               | `heatmap.py`                             | No          |
+| `simulation/heatmaps`               | `heatmap_generator_base.py`              | No          |
+| `simulation/heatmaps/neighbourhood` | `neumann_neighbourhood.py`               | Yes         |
+| `simulation/heatmaps/neighbourhood` | `moore_neighbourhood.py`                 | Yes         |
+| `simulation/heatmaps/neighbourhood` | `base_neighbourhood.py`                  | No          |
+| `simulation/heatmaps/distancing`    | `euclidean_distance.py`                  | Yes         |
+| `simulation/heatmaps/distancing`    | `taxi_distance.py`                       | Yes         |
+| `simulation/heatmaps/distancing`    | `base_distance`                          | No          |
