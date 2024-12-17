@@ -24,11 +24,10 @@ class FastMarchingHeatmapGenerator(HeatmapGeneratorBase):
         :param delta_x: distance between cells
         :param blocked: set of CellStates that are considered blocked, default is {CellState.OBSTACLE}
         """
-        super().__init__(blocked or {CellState.OBSTACLE})
+        super().__init__(blocked if blocked is not None else {CellState.OBSTACLE})
         self._neumann = NeumannNeighbourhood(1, 1)
         self._distancing = distancing
         self._delta_x = distancing.get_scale()
-        self._blocked = blocked if blocked is not None else {CellState.OBSTACLE}
 
     def _get_narrow_band(self, cell: Cell, grid: SimulationGrid) -> Generator[Cell]:
         for x, y in self._neumann.get_neighbours(cell.get_x(), cell.get_y(), 1, 1):
