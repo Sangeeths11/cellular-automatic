@@ -3,6 +3,7 @@ from src.enums.tileStatus import TileStatus
 
 from random import uniform
 
+# sure it's a tile?
 class Tile():
 
     def __init__(self, tileDTO: TileDTO) -> None:

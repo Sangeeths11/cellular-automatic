@@ -1,5 +1,6 @@
 from src.enums.tileStatus import TileStatus
 
+# what is DTO? Please do not use abbreviations that are not clear
 class TileDTO():
 
     def __init__(self, tileStatus: TileStatus, pedastrianValue: float) -> None:
