@@ -1,5 +1,7 @@
 import unittest
 from unittest.mock import Mock
+
+from simulation.core.cell_state import CellState
 from simulation.core.target import Target
 from simulation.core.cell import Cell
 from simulation.core.position import Position
@@ -17,6 +19,7 @@ class TestTarget(unittest.TestCase):
         self.heatmap = Mock(spec=Heatmap)
 
         self.heatmap_generator.generate_heatmap.return_value = self.heatmap
+        self.heatmap_generator.get_blocked.return_value = {CellState.OCCUPIED, CellState.OBSTACLE}
 
         self.target = Target(
             name=self.name,

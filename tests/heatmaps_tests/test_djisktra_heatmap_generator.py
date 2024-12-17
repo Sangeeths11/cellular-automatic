@@ -89,7 +89,7 @@ class TestDijkstraHeatmapGenerator(unittest.TestCase):
         # Arrange
         grid = SimulationGrid(3, 3, MooreNeighbourhood)
         distance = EuclideanDistance(1)
-        generator = DijkstraHeatmapGenerator(distance, {})
+        generator = DijkstraHeatmapGenerator(distance, set())
 
         grid.get_cell(1, 0).set_osbtacle()
 

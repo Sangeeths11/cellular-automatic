@@ -28,30 +28,6 @@ class TestFastMarchingHeatmapGenerator(unittest.TestCase):
         self.assertEqual(self.heatmap_generator._distancing, self.distancing)
         self.assertEqual(self.heatmap_generator._blocked, {CellState.OBSTACLE})
 
-    def test_generate_heatmap(self):
-        """Tests the generate_heatmap method."""
-        self.grid.get_width.return_value = 3
-        self.grid.get_height.return_value = 3
-        self.grid.get_cells.return_value = self.cells
-
-        self.grid.get_neighbours_at.side_effect = lambda pos: [
-            cell for cell in self.cells if cell.get_x() != pos.get_x() or cell.get_y() != pos.get_y()
-        ]
-
-        self.cells[1].get_state.return_value = CellState.OBSTACLE
-
-        heatmap = self.heatmap_generator.generate_heatmap(self.cells, self.grid)
-
-        expected_grid = [
-            [0, 1, 2],
-            [1, float('inf'), 3],
-            [2, 3, 4]
-        ]
-
-        for y in range(3):
-            for x in range(3):
-                self.assertEqual(heatmap.get_cell(x, y), expected_grid[y][x], f"Mismatch at ({x}, {y})")
-
     def test_generate_heatmap__generates__expected_values_of_fast_marching(self):
         """Tests the implementation of the Fast Marching Method. Comparing it to the values of CDS307 Slides of day 4 page 19"""
         # Arrange

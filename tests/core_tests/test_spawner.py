@@ -61,16 +61,12 @@ class TestSpawner(unittest.TestCase):
         self.spawner._total_spawns = 0
         self.assertTrue(self.spawner.is_done())
 
-    @patch.object(Spawner, 'spawn')
-    def test_update_spawning(self, mock_spawn):
+    def test_update_spawning(self):
         """Test update method when spawning occurs."""
-        mock_pedestrians = [Mock(), Mock()]
-        mock_spawn.return_value = mock_pedestrians
         pedestrians = list(self.spawner.update(1.0))
-        mock_spawn.assert_called_once()
-        self.assertEqual(pedestrians, mock_pedestrians)
+        self.assertEqual(len(pedestrians), 2)
         self.assertEqual(self.spawner._current_delay, 1.0)
-        self.assertEqual(self.spawner._total_spawns, 9)
+        self.assertEqual(self.spawner._total_spawns, 8)
 
     @patch.object(Spawner, 'spawn')
     def test_update_no_spawn_due_to_delay(self, mock_spawn):

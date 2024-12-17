@@ -20,7 +20,7 @@ class DijkstraHeatmapGenerator(HeatmapGeneratorBase):
         :param distancing: algorithm for calculating distance between cells
         :param blocked:  set of CellStates that are considered blocked, default is {CellState.OBSTACLE}
         """
-        super().__init__(blocked or {CellState.OBSTACLE})
+        super().__init__(blocked if blocked is not None else {CellState.OBSTACLE})
         self._distancing = distancing
 
 
