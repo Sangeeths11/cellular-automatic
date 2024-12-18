@@ -2,7 +2,8 @@
 
 ## Table of Contents
 
-[1. Overview](#overview)
+[1. Overview](#section/overview) \
+[1.1 Getting Started](#overview/getting-started)
 
 [2. Configuration](#section/configuration) \
 [2.1 Configuration Types](#configuration/types) \
@@ -44,13 +45,30 @@
 [5.1 Testing Coverage](#testing/coverage)
 
 
-<h2 id="overview"> Overview</h2>
+<h2 id="section/overview"> Overview</h2>
 
 The main file of this project is run.py the first passed argument is the path to a json [
 `simulation configuration`](#section/configuration) file.
 
 The visualisation will start automatically with the simulation. See the [`manual`](#section/visualisation) for a basic
 overview of the visualisation.
+
+<h3 id="overview/getting-started">Getting Started</h3>
+
+Make sure that you are on python 3.13 and have installed the required dependencies found in `requirements.txt`.
+
+```shell
+python -m venv ./.venv
+source ./.venv/bin/activate
+pip install -r requirements.txt
+```
+
+To run the simulation call `run.py` and pass the path to a simulation configuration file as the first argument.
+For example to run the `Chicken Test` :
+
+```shell
+python run.py ./simulation_config/chicken_test.json
+```
 
 <h2 id="section/configuration"> Configuration</h2>
 
