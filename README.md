@@ -57,9 +57,27 @@ overview of the visualisation.
 
 Make sure that you are on python 3.13 and have installed the required dependencies found in `requirements.txt`.
 
+
+On Linux:
 ```shell
 python -m venv ./.venv
 source ./.venv/bin/activate
+pip install -r requirements.txt
+```
+
+On Windows using powershell
+```powershell
+python --version # make sure python 3.13 is returned
+python -m venv ./.venv
+& ./.venv/Scripts/activate.ps1
+pip install -r requirements.txt
+```
+
+On Windows using batch
+```bat
+python --version # make sure python 3.13 is returned
+python -m venv ./.venv
+.\.venv\Scripts\activate.bat
 pip install -r requirements.txt
 ```
 
