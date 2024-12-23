@@ -33,7 +33,7 @@
     {
       "name": "Target",
       "cells": [[69, 13], [69, 14], [69, 15], [69, 16]],
-      "heatmap_generator": "DijkstraHeatmapGenerator",
+      "heatmap_generator": "DistanceHeatmapGenerator",
       "cellstate": ["OBSTACLE"]
     }
   ],
