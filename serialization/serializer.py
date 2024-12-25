@@ -11,6 +11,7 @@ class Serializer:
         self._simulation = simulation
         self._file = open(file, "w")
         self._initialize()
+        self._is_first = True
         pass
 
     def _initialize(self):
@@ -58,13 +59,20 @@ class Serializer:
         if self._file is None:
             return
 
+        if self._is_first:
+            self._is_first = False
+        else:
+            self._file.write(",\n")
+
+        self._file.write(json.dumps(self.handle_serializable(self._simulation)))
         if self._simulation.is_done():
-            self._file.write(json.dumps(self.handle_serializable(self._simulation)) + "]}")
+            self.close()
+
+    def close(self):
+        if self._file is not None:
+            self._file.write("]}")
             self._file.close()
             self._file = None
-        else:
-            self._file.write(json.dumps(self.handle_serializable(self._simulation)) + ",\n")
-
 
     def handle_dict(self, data: dict[str, any]) -> dict[str, any]:
         for key, value in data.items():

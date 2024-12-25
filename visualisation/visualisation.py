@@ -1,4 +1,5 @@
 import datetime
+import json
 import math
 from random import random
 from typing import Tuple, Type, TypeVar
@@ -12,6 +13,7 @@ from simulation.core.cell_state import CellState
 from simulation.core.position import Position
 from simulation.core.simulation import Simulation
 from visualisation.button import Button
+from visualisation.features.flowmeters_visualisation import FlowMetersVisualisation
 from visualisation.features.grid_visualisation_feature import GridVisualisationFeature
 from visualisation.features.path_visualisation_feature import PathVisualisationFeature
 from visualisation.features.pedestrian_visualisation_feature import PedestrianVisualisationFeature
@@ -20,6 +22,7 @@ from visualisation.features.spawner_visualisation_feature import SpawnerVisualis
 from visualisation.features.target_heatmap_visualisation_feature import TargetHeatmapVisualisationFeature
 from visualisation.features.target_visualisation_feature import TargetVisualisationFeature
 from visualisation.features.waypoint_visualisation_feature import WaypointVisualisationFeature
+from visualisation.flow_meter import FlowMeter
 from visualisation.shortcut import Shortcut
 from visualisation.theme import Theme, DEFAULT_THEME
 from visualisation.toggle_button import ToggleButton
@@ -30,7 +33,7 @@ from visualisation.visualisation_helper import VisualisationHelper
 class Visualisation:
     GRID_OFFSET = 200
 
-    def __init__(self, simulation: Simulation, cell_size: int | None = None, fps: float = 30, log_file: str = None):
+    def __init__(self, simulation: Simulation, cell_size: int | None = None, fps: float = 30, log_file: str = None, flow_meters: list[FlowMeter] = None):
         pygame.init()
         simulation.update(0) # Update simulation once to get the initial state
         self.simulation = simulation
@@ -61,9 +64,17 @@ class Visualisation:
         self._show_feature_details = self._screen.get_width() > 800
         self._show_buttons = True
         self._init_features()
+        self._flow_meters: list[FlowMeter] = flow_meters or None
+        self._flow_log = open(datetime.datetime.now().strftime("%d%m%y_%H%M%S") + "_flow_log.json", "w") if self._flow_meters is not None else None
+        self._is_first_flow_log = True
         self._serializer = Serializer(simulation, log_file.format(datetime.datetime.now().strftime("%d%m%y_%H%M%S"))) if log_file is not None else None
+        self._init_flow_log()
 
     TFeature = TypeVar('TFeature', bound=VisualisationFeatureBase)
+
+
+    def get_flow_meters(self) -> list[FlowMeter]:
+        return self._flow_meters
 
     def get_cell_size(self) -> int:
         return self._cell_size
@@ -106,6 +117,7 @@ class Visualisation:
         target = self.add_feature(TargetVisualisationFeature(self.simulation, self, self._helper))
         grid = self.add_feature(GridVisualisationFeature(self.simulation, self, self._helper))
         path = self.add_feature(PathVisualisationFeature(self.simulation, self, self._helper))
+        flow_meter = self.add_feature(FlowMetersVisualisation(self.simulation, self, self._helper), True)
         waypoint = self.add_feature(WaypointVisualisationFeature(self.simulation, self, self._helper))
         pedestrian = self.add_feature(PedestrianVisualisationFeature(self.simulation, self, self._helper))
         info = self.add_feature(SimulationInfoVisualisationFeature(self.simulation, self, self._helper), False)
@@ -117,6 +129,7 @@ class Visualisation:
         self.add_shortcut(Shortcut("Toggle info", pygame.K_i, 0, info.set_enabled, True, info.is_enabled()), True, "Info {0}")
         self.add_shortcut(Shortcut("Toggle social distancing", pygame.K_d, 0, heatmap.set_social_distancing, True, heatmap.get_social_distancing()), True, "Social distancing\n{0}")
         self.add_shortcut(Shortcut("Toggle route", pygame.K_r, 0, path.set_enabled, True, path.is_enabled()), True, "Pathing {0}")
+        self.add_shortcut(Shortcut("Toggle flow meters", pygame.K_f, 0, flow_meter.set_enabled, True, flow_meter.is_enabled()), True, "Flow meters {0}")
         self.add_shortcut(Shortcut("Toggle grid lines", pygame.K_l, 0, grid.set_show_lines, True, grid.get_show_lines()), True, "Grid lines\n{0}")
         self.add_shortcut(Shortcut("Toggle waypoint", pygame.K_w, 0, waypoint.set_enabled, True, waypoint.is_enabled()), True, "Waypoints {0}")
         self.add_shortcut(Shortcut("Show object names", pygame.K_n, 0, self._set_show_names, True, False), True, "Show names\n{0}")
@@ -143,8 +156,7 @@ class Visualisation:
     def handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                self._running = False
+                self._handle_quit()
             if event.type == pygame.KEYDOWN:
                 self._handle_key_event(event.key, event.mod)
             elif event.type == pygame.VIDEORESIZE:
@@ -154,6 +166,17 @@ class Visualisation:
                 self._handle_mouse_move_event(event.pos[0], event.pos[1])
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 self._handle_click_event(event.button, event.pos[0], event.pos[1])
+
+    def _handle_quit(self):
+        pygame.quit()
+        self._running = False
+
+        if self._serializer is not None:
+            self._serializer.close()
+
+        if self._flow_log is not None:
+            self._close_flow_log()
+
 
     def _handle_key_event(self, key: int, mod: int) -> None:
         # handle key press events, check for shortcuts
@@ -205,6 +228,37 @@ class Visualisation:
             path.set_pedestrian(pedestrian)
             path.set_enabled(True)
 
+    def _init_flow_log(self):
+        if self._flow_log is not None:
+            setup_data = {
+                "time_resolution": self.simulation.get_time_resolution(),
+                "flow_meters": [meter.get_initial_data() for meter in self._flow_meters],
+            }
+            self._flow_log.write(f"{{\n    \"setup\": {json.dumps(setup_data, indent=4)},\n   \"flow_data\": [\n")
+
+    def _close_flow_log(self):
+        if self._flow_log is not None:
+            self._flow_log.write("\n]}")
+            self._flow_log.close()
+            self._flow_log = None
+
+    def _write_flow_log(self):
+        if self._flow_log is not None:
+            if self._is_first_flow_log:
+                self._is_first_flow_log = False
+            else:
+                self._flow_log.write(",\n")
+
+            for meter in self._flow_meters:
+                meter.update(self.simulation)
+
+            data = {
+                "step": self.simulation.get_steps(),
+                "time": self.simulation.get_run_time(),
+                "pedestrian_density": len(self.simulation.get_pedestrians()) / (self.simulation.get_grid().get_width() * self.simulation.get_grid().get_height()),
+                "flow": {meter.get_name(): meter.get_flow_rate() for meter in self._flow_meters}
+            }
+            self._flow_log.write(json.dumps(data, indent=4))
 
     def update(self, delta) -> None:
         # update simulation if not paused and bookkeep time delta
@@ -213,6 +267,7 @@ class Visualisation:
             if self._simulation_delta >= self.simulation.get_time_resolution():
                 self.simulation.update(self._simulation_delta)
                 self._simulation_delta = 0
+                self._write_flow_log()
                 if self._serializer is not None:
                     self._serializer.write_current_state()
 
