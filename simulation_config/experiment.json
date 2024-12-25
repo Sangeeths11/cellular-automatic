@@ -1,19 +1,33 @@
 {
   "grid": {
-    "width": 10,
-    "height": 10,
+    "width": 70,
+    "height": 35,
     "neighbourhood": "MooreNeighbourhood"
   },
   "obstacles": [
-    {
-      "name": "bound",
-      "rect": [0, 0, 1, 1]
-    }
   ],
   "spawners": [
     {
-      "name": "Spawner",
-      "rect": [8,8,8,8],
+      "name": "firstWall",
+      "rect": [35, 16, 35, 16],
+      "targets": ["infinity"],
+      "total_spawns": 1,
+      "batch_size": 3,
+      "spawn_delay": 1,
+      "initial_delay": 0.0
+    },
+    {
+      "name": "secondWall",
+      "rect": [35,18,35,18],
+      "targets": ["infinity"],
+      "total_spawns": 1,
+      "batch_size": 3,
+      "spawn_delay": 1,
+      "initial_delay": 0.0
+    },
+    {
+      "name": "pedestrian",
+      "rect": [0,17,0,17],
       "targets": ["Target"],
       "total_spawns": 1,
       "batch_size": 3,
@@ -23,15 +37,21 @@
   ],
   "targets": [
     {
-      "name": "Target",
+      "name": "infinity",
       "rect": [8, 0, 8, 0],
       "heatmap_generator": "InfinityHeatmapGenerator",
+      "cellstate": ["OBSTACLE"]
+    },
+    {
+      "name": "Target",
+      "rect": [69, 17, 69, 17],
+      "heatmap_generator": "DijkstraHeatmapGenerator",
       "cellstate": ["OBSTACLE"]
     }
   ],
   "social_distancing": {
-    "width": 3,
-    "height": 3
+    "width": 50,
+    "height": 50
   },
   "obstacle_repulsion": {
     "width": 2,
