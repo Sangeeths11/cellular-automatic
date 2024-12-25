@@ -152,8 +152,10 @@ class Simulation(Serializable):
 
     def _get_next_target_cell(self, heatmap: Heatmap, pos: Position, last_pos: Position) -> Cell | None:
         neighbours = self._grid.get_neighbours_at(pos)
-        for cell in sorted(neighbours, key=lambda n: self._get_cell_value(last_pos, n, heatmap)):
-            if self._occupation_bias_modifier is not None or cell.is_free():
+        neigbour_values = [(cell, self._get_cell_value(last_pos, cell, heatmap)) for cell in neighbours]
+        sorted_neighbours = sorted(neigbour_values, key=lambda n: n[1]); 
+        for cell, value in sorted_neighbours:
+            if (self._occupation_bias_modifier is not None or cell.is_free()) and value != Heatmap.INFINITY:
                 return cell
 
         return None

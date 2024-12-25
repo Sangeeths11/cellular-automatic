@@ -1,7 +1,7 @@
 {
   "grid": {
-    "width": 180,
-    "height": 70,
+    "width": 10,
+    "height": 10,
     "neighbourhood": "MooreNeighbourhood"
   },
   "obstacles": [
@@ -13,7 +13,7 @@
   "spawners": [
     {
       "name": "Spawner",
-      "rect": [50, 50, 50, 50],
+      "rect": [8,8,8,8],
       "targets": ["Target"],
       "total_spawns": 1,
       "batch_size": 3,
@@ -24,8 +24,8 @@
   "targets": [
     {
       "name": "Target",
-      "rect": [0, 0, 0, 0],
-      "heatmap_generator": "DijkstraHeatmapGenerator",
+      "rect": [8, 0, 8, 0],
+      "heatmap_generator": "InfinityHeatmapGenerator",
       "cellstate": ["OBSTACLE"]
     }
   ],
