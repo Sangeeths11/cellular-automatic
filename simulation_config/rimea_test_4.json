@@ -55,6 +55,13 @@
     "occupation_bias_modifier": 1.0,
     "retargeting_threshold": -2.0
   },
+  "flow_meters": [
+    {
+      "name": "FlowMeter",
+      "rect": [95, 1, 95, 20],
+      "time_span": 5.0
+    }
+  ],
   "distancing": {
     "type": "EuclideanDistance",
     "scale": 0.5

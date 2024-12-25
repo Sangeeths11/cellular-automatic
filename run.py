@@ -8,6 +8,7 @@ from simulation.core.spawner import Spawner
 from simulation.core.target import Target
 from simulation.core.targeting_stratey import TargetingStrategy
 from simulation.heatmaps.social_distancing_heatmap_generator import SocialDistancingHeatmapGenerator
+from visualisation.flow_meter import FlowMeter
 from visualisation.visualisation import Visualisation
 from simulation_config.config_loader import SimulationConfigLoader
 
@@ -77,8 +78,18 @@ def main(config_path):
         SimulationConfigLoader.create_heatmap_generator(simulation_config["simulation"].get("waypoint_heatmap_generator", None), distancing, None)
     )
 
+    flow_meters = None
+
+    if "flow_meters" in simulation_config:
+        flow_meters = []
+        for flow_meter_config in simulation_config["flow_meters"]:
+            name = flow_meter_config["name"]
+            time_span = flow_meter_config.get("time_span")
+            cells = list(get_cells(flow_meter_config, grid))
+            flow_meters.append(FlowMeter(name, time_span, cells))
+
     log_file = simulation_config.get("log_file", None)
-    vis = Visualisation(sim, None, 30.0, log_file)
+    vis = Visualisation(sim, None, 30.0, log_file, flow_meters)
     vis.run()
 
 

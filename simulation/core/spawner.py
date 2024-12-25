@@ -33,9 +33,13 @@ class Spawner(Serializable):
         self._current_delay: float = initial_delay
         self._distancing: 'DistanceBase' = distancing
         self._targeting_strategy: TargetingStrategy = targeting_strategy
+        self._spawn_count: int = 0
 
     def get_name(self) -> str:
         return self._name
+
+    def get_spawn_count(self) -> int:
+        return self._spawn_count
 
     def get_cells(self) -> ImmutableList['Cell']:
         return ImmutableList(self._cells)
@@ -57,10 +61,12 @@ class Spawner(Serializable):
         if self._total_spawns is not None:
             if self._total_spawns > 0:
                 self._total_spawns -= 1
+                self._spawn_count += 1
                 return True
             else:
                 return False
 
+        self._spawn_count += 1
         return True
 
     def _get_target(self, cell) -> 'Target':
@@ -90,7 +96,8 @@ class Spawner(Serializable):
         return {
             "id": self.get_identifier(),
             "total_spawns": self._total_spawns,
-            "current_delay": self._current_delay
+            "current_delay": self._current_delay,
+            "spawn_count": self._spawn_count
         }
 
     def get_identifier(self) -> str:
