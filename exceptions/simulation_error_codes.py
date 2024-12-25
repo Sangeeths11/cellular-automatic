@@ -17,3 +17,4 @@ class SimulationErrorCode(ErrorCodeDataMixin, Enum):
     ALREADY_IN_CELL = 10, "The pedestrian is already in the cell and can't target it"
     CANNOT_MOVE = 11, "Move was called but the pedestrian can't move or has already reached it's target"
     NO_FIXED_NEIGHBOURS = 12, "No fixed neighbours found for fast marching algorithm"
+    TELEPORTER_FULL = 13, "Trying to spawn a pedestrian on an full teleporter."

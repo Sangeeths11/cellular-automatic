@@ -16,6 +16,7 @@ from simulation.core.cell import Cell
 from simulation.core.cell_state import CellState
 from simulation.core.position import Position
 from simulation.core.spawner import Spawner
+from simulation.core.teleporter import Teleporter
 from simulation.core.target import Target
 from simulation.core.waypoint import Waypoint
 from simulation.heatmaps.distancing.base_distance import DistanceBase
@@ -33,7 +34,7 @@ from utils.utils import none_check
 class Simulation(Serializable):
     def __init__(self, time_resolution: float, grid: SimulationGrid, distancing: DistanceBase,
                  social_distancing: SocialDistancingHeatmapGenerator, targets: list[Target], spawners: list[Spawner],
-                 occupation_bias_modifier: float | None = 1.0, retargeting_threshold: float | None = -1.0, waypoint_threshold: float | None = None, waypoint_distance: int | None = None, waypoint_heatmap_generator: HeatmapGeneratorBase | None = None):
+                 occupation_bias_modifier: float | None = 1.0, retargeting_threshold: float | None = -1.0, waypoint_threshold: float | None = None, waypoint_distance: int | None = None, waypoint_heatmap_generator: HeatmapGeneratorBase | None = None, teleporter: Teleporter | None = None):
         self._pedestrians: list[Pedestrian] = list()
         self._grid: SimulationGrid = grid
         self._targets: list[Target] = targets
@@ -52,6 +53,7 @@ class Simulation(Serializable):
         self._waypoints: list[Waypoint] = []
         self._waypoint_pathfinding_heatmap_generator: DijkstraHeatmapGenerator = DijkstraHeatmapGenerator(distancing, {CellState.OBSTACLE, CellState.OCCUPIED})
         self._waypoint_heatmap_cache: dict[Target, Heatmap] = {}
+        self._teleporter = teleporter
 
         waypoint_none, none_fields = none_check(waypoint_threshold=waypoint_threshold, waypoint_distance=waypoint_distance, waypoint_heatmap_generator=waypoint_heatmap_generator)
         if waypoint_none is False:
@@ -118,10 +120,25 @@ class Simulation(Serializable):
         pedestrian.set_waypoint(waypoint)
 
     def _remove_pedestrian(self, pedestrian: Pedestrian):
-        self._pedestrians.remove(pedestrian)
-        cell = self._grid.get_cell_at_pos(pedestrian)
-        cell.remove_pedestrian()
-        pedestrian.set_reached_target()
+        if not self._teleporter:
+            self._pedestrians.remove(pedestrian)
+            cell = self._grid.get_cell_at_pos(pedestrian)
+            cell.remove_pedestrian()
+            pedestrian.set_reached_target()
+        if self._teleporter and self._teleporter.has_free_cell():
+            self._respawn_pedestrian_in_cell(pedestrian)
+            self._pedestrians.remove(pedestrian)
+            cell = self._grid.get_cell_at_pos(pedestrian)
+            cell.remove_pedestrian()
+            pedestrian.set_reached_target()
+
+    def _respawn_pedestrian_in_cell(self, pedestrian: Pedestrian) -> None:
+        speed = pedestrian.get_optimal_speed()
+        spawner = pedestrian.get_spawner()
+        target = pedestrian.get_target()
+        distancing = pedestrian.get_distancing()
+        time_alive = pedestrian.get_time_alive()
+        self._add_pedestrian(self._teleporter.spawn(speed, spawner, target, distancing, time_alive))
 
     def _add_pedestrian(self, pedestrian: Pedestrian):
         cell = self._grid.get_cell_at_pos(pedestrian)

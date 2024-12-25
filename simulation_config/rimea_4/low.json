@@ -27,7 +27,7 @@
       "name": "Spawner",
       "rect": [0, 1, 104, 9],
       "targets": ["Target"],
-      "total_spawns": 100000000,
+      "total_spawns": 5,
       "batch_size": 5,
       "spawn_delay": 1,
       "initial_delay": 0.0
@@ -41,6 +41,10 @@
       "cellstate": ["OBSTACLE"]
     }
   ],
+  "teleports": {
+      "name": "teleporter",
+      "rect": [0,1,0,9]
+  },
   "social_distancing": {
     "width": 3,
     "height": 3
