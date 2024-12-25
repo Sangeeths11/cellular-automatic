@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING
 
 from serialization.serializable import Serializable
+import csv
 
 if TYPE_CHECKING:
     from simulation.core.cell import Cell
@@ -8,12 +9,17 @@ if TYPE_CHECKING:
 
 
 class FlowMeter:
-    def __init__(self, name: str, time_span: float, cells: 'list[Cell]'):
+    HEADERS = ['runTime', 'flowRate', 'pedestrianDensity']
+
+    def __init__(self, name: str, time_span: float, cells: 'list[Cell]', logfile: str = None, log_interval: float = float("inf")):
         self._name = name
         self._flow_rate = 0
         self._time_span: float = time_span
         self._cells: 'list[Cell]' = cells
         self._seen_pedestrians: dict[int, float] = {}
+        self._logfile = logfile
+        self._log_interval = log_interval
+        self._delta_time = log_interval
 
     def get_initial_data(self) -> dict[str, any]:
         return {
@@ -39,3 +45,19 @@ class FlowMeter:
 
     def get_cells(self) -> 'list[Cell]':
         return self._cells
+    
+    def create_log(self) -> None:
+        with open(self._logfile, mode="w", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerow(self.HEADERS)
+
+    def log(self, delta_time: float, runtime: float, pedestrian_density: float) -> None:
+        self._delta_time -= delta_time
+        if self._delta_time < 0:
+            self._log(runtime, pedestrian_density)
+            self._delta_time = self._log_interval
+
+    def _log(self, runtime, pedestrian_density: float) -> None:
+        with open(self._logfile, "a", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerow([runtime, self.get_flow_rate(), pedestrian_density])

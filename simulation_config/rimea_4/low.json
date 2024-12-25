@@ -27,10 +27,10 @@
       "name": "Spawner",
       "rect": [0, 1, 104, 9],
       "targets": ["Target"],
-      "total_spawns": 5,
-      "batch_size": 5,
-      "spawn_delay": 1,
-      "initial_delay": 0.0
+      "total_spawns": 600,
+      "batch_size": 10,
+      "spawn_delay": 30,
+      "initial_delay": 5.0
     }
   ],
   "targets": [
@@ -63,7 +63,9 @@
     {
       "name": "FlowMeter",
       "rect": [46, 1, 46, 9],
-      "time_span": 180.0
+      "time_span": 15.0,
+      "logfile": "flowMeter.csv",
+      "log_interval": 30
     }
   ],
   "distancing": {

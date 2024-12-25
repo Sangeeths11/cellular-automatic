@@ -27,8 +27,8 @@
       "name": "Spawner",
       "rect": [0, 1, 104, 9],
       "targets": ["Target"],
-      "total_spawns": 1000,
-      "batch_size": 200,
+      "total_spawns": 600,
+      "batch_size": 600,
       "spawn_delay": 1,
       "initial_delay": 0.0
     }
@@ -41,6 +41,10 @@
       "cellstate": ["OBSTACLE"]
     }
   ],
+  "teleports": {
+      "name": "teleporter",
+      "rect": [0,1,0,9]
+  },
   "social_distancing": {
     "width": 3,
     "height": 3
@@ -59,7 +63,8 @@
     {
       "name": "FlowMeter",
       "rect": [46, 1, 46, 9],
-      "time_span": 5.0
+      "time_span": 60,
+      "logName": "flowmeter_log.json"
     }
   ],
   "distancing": {
