@@ -1,0 +1,50 @@
+{
+  "grid": {
+    "width": 180,
+    "height": 70,
+    "neighbourhood": "MooreNeighbourhood"
+  },
+  "obstacles": [
+    {
+      "name": "bound",
+      "rect": [0, 0, 1, 1]
+    }
+  ],
+  "spawners": [
+    {
+      "name": "Spawner",
+      "rect": [50, 50, 50, 50],
+      "targets": ["Target"],
+      "total_spawns": 1,
+      "batch_size": 3,
+      "spawn_delay": 1,
+      "initial_delay": 0.0
+    }
+  ],
+  "targets": [
+    {
+      "name": "Target",
+      "rect": [0, 0, 0, 0],
+      "heatmap_generator": "DijkstraHeatmapGenerator",
+      "cellstate": ["OBSTACLE"]
+    }
+  ],
+  "social_distancing": {
+    "width": 3,
+    "height": 3
+  },
+  "obstacle_repulsion": {
+    "width": 2,
+    "height": 2,
+    "intensity": 1.0
+  },
+  "simulation": {
+    "time_resolution": 0.1,
+    "occupation_bias_modifier": 1.0,
+    "retargeting_threshold": -2.0
+  },
+  "distancing": {
+    "type": "EuclideanDistance",
+    "scale": 0.5
+  }
+}
