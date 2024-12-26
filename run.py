@@ -2,6 +2,7 @@ import sys
 from typing import Generator
 
 from simulation.core.cell import Cell
+from simulation.core.teleporter import Teleporter
 from simulation.core.simulation import Simulation
 from simulation.core.simulation_grid import SimulationGrid
 from simulation.core.spawner import Spawner
@@ -64,6 +65,23 @@ def main(config_path):
         simulation_config["social_distancing"]["height"]
     )
 
+    teleporter = None
+    if "teleports" in simulation_config:
+        teleporter_cells = list(get_cells(simulation_config["teleports"], grid))
+        teleporter = Teleporter(teleporter_cells)
+
+    flow_meters = None
+
+    if "flow_meters" in simulation_config:
+        flow_meters = []
+        for flow_meter_config in simulation_config["flow_meters"]:
+            name = flow_meter_config["name"]
+            time_span = flow_meter_config.get("time_span")
+            logfile = flow_meter_config.get("logfile")
+            log_interval = flow_meter_config.get("log_interval")
+            cells = list(get_cells(flow_meter_config, grid))
+            flow_meters.append(FlowMeter(name, time_span, cells, logfile, log_interval))
+
     sim = Simulation(
         simulation_config["simulation"]["time_resolution"],
         grid,
@@ -75,18 +93,12 @@ def main(config_path):
         simulation_config["simulation"].get("retargeting_threshold", -1.0),
         simulation_config["simulation"].get("waypoint_threshold", None),
         simulation_config["simulation"].get("waypoint_distance", None),
-        SimulationConfigLoader.create_heatmap_generator(simulation_config["simulation"].get("waypoint_heatmap_generator", None), distancing, None)
+        SimulationConfigLoader.create_heatmap_generator(simulation_config["simulation"].get("waypoint_heatmap_generator", None), distancing, None),
+        teleporter=teleporter,
+        flow_meter=flow_meters
     )
 
-    flow_meters = None
-
-    if "flow_meters" in simulation_config:
-        flow_meters = []
-        for flow_meter_config in simulation_config["flow_meters"]:
-            name = flow_meter_config["name"]
-            time_span = flow_meter_config.get("time_span")
-            cells = list(get_cells(flow_meter_config, grid))
-            flow_meters.append(FlowMeter(name, time_span, cells))
+    
 
     log_file = simulation_config.get("log_file", None)
     vis = Visualisation(sim, None, 30.0, log_file, flow_meters)

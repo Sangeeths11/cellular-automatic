@@ -1,0 +1,70 @@
+{
+  "grid": {
+    "width": 70,
+    "height": 35,
+    "neighbourhood": "MooreNeighbourhood"
+  },
+  "obstacles": [
+  ],
+  "spawners": [
+    {
+      "name": "firstWall",
+      "rect": [35, 16, 35, 16],
+      "targets": ["infinity"],
+      "total_spawns": 1,
+      "batch_size": 3,
+      "spawn_delay": 1,
+      "initial_delay": 0.0
+    },
+    {
+      "name": "secondWall",
+      "rect": [35,18,35,18],
+      "targets": ["infinity"],
+      "total_spawns": 1,
+      "batch_size": 3,
+      "spawn_delay": 1,
+      "initial_delay": 0.0
+    },
+    {
+      "name": "pedestrian",
+      "rect": [0,17,0,17],
+      "targets": ["Target"],
+      "total_spawns": 1,
+      "batch_size": 3,
+      "spawn_delay": 1,
+      "initial_delay": 0.0
+    }
+  ],
+  "targets": [
+    {
+      "name": "infinity",
+      "rect": [8, 0, 8, 0],
+      "heatmap_generator": "InfinityHeatmapGenerator",
+      "cellstate": ["OBSTACLE"]
+    },
+    {
+      "name": "Target",
+      "rect": [69, 17, 69, 17],
+      "heatmap_generator": "DijkstraHeatmapGenerator",
+      "cellstate": ["OBSTACLE"]
+    }
+  ],
+  "social_distancing": {
+    "width": 50,
+    "height": 50
+  },
+  "obstacle_repulsion": {
+    "width": 2,
+    "height": 2,
+    "intensity": 1.0
+  },
+  "simulation": {
+    "time_resolution": 0.1,
+    "occupation_bias_modifier": 1.0,
+    "retargeting_threshold": -2.0
+  },
+  "distancing": {
+    "type": "EuclideanDistance",
+    "scale": 0.5
+  }
+}

@@ -7,11 +7,11 @@
   "obstacles": [
     {
       "name": "left_center",
-      "rect": [3, 4, 5, 6]
+      "rect": [23, 4, 25, 6]
     },
     {
       "name": "middle_center",
-      "rect": [47, 4, 50, 8]
+      "rect": [67, 4, 70, 8]
     },
     {
       "name": "upper_wall",
@@ -24,13 +24,22 @@
   ],
   "spawners": [
     {
-      "name": "Spawner",
-      "rect": [0, 1, 0, 9],
+      "name": "initial Spawner",
+      "rect": [0, 1, 104, 9],
       "targets": ["Target"],
-      "total_spawns": 100,
-      "batch_size": 1,
-      "spawn_delay": 1,
-      "initial_delay": 0.0
+      "total_spawns": 600,
+      "batch_size": 600,
+      "spawn_delay": 1.0,
+      "initial_delay": 0
+    },
+    {
+      "name": "Spawner",
+      "rect": [0, 1, 104, 9],
+      "targets": ["Target"],
+      "total_spawns": 600,
+      "batch_size": 30,
+      "spawn_delay": 45,
+      "initial_delay": 5.0
     }
   ],
   "targets": [
@@ -41,6 +50,10 @@
       "cellstate": ["OBSTACLE"]
     }
   ],
+  "teleports": {
+      "name": "teleporter",
+      "rect": [0,1,0,9]
+  },
   "social_distancing": {
     "width": 3,
     "height": 3
@@ -59,7 +72,9 @@
     {
       "name": "FlowMeter",
       "rect": [46, 1, 46, 9],
-      "time_span": 5.0
+      "time_span": 44,
+      "logfile": "flowMeterHigh.csv",
+      "log_interval": 45
     }
   ],
   "distancing": {

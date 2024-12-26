@@ -3,6 +3,7 @@ from exceptions.simulation_error_codes import SimulationErrorCode
 from serialization.serializable import Serializable
 from simulation.core.cell_state import CellState
 from simulation.core.position import Position
+from simulation.heatmaps.distancing.base_distance import DistanceBase
 from typing import TYPE_CHECKING
 
 from simulation.core.waypoint import Waypoint
@@ -24,7 +25,7 @@ class Pedestrian(Position, Serializable):
         Pedestrian.ID_COUNTER += 1
         return Pedestrian.ID_COUNTER
 
-    def __init__(self, x: int, y: int, speed: float, spawner: 'Spawner', target: 'Target', distancing: 'DistanceBase'):
+    def __init__(self, x: int, y: int, speed: float, spawner: 'Spawner', target: 'Target', distancing: 'DistanceBase', time_alive: float = 0):
         super().__init__(x, y)
         self._id: int = Pedestrian.get_next_id()
         self._optimal_speed: float = speed
@@ -35,7 +36,7 @@ class Pedestrian(Position, Serializable):
         self._distance_to_target: float = Pedestrian.INFINITY
         self._distancing: 'DistanceBase' = distancing
         self._target_cell: 'Cell' | None = None
-        self._time_alive: float = 0
+        self._time_alive: float = time_alive
         self._total_distance_moved: float = 0
         self._refund_distance_flag = False
         self._reached_target = False
@@ -155,3 +156,9 @@ class Pedestrian(Position, Serializable):
 
     def get_identifier(self) -> str:
         return str(self._id)
+    
+    def get_distancing(self) -> DistanceBase:
+        return self._distancing
+    
+    def get_time_alive(self) -> float:
+        return self._time_alive

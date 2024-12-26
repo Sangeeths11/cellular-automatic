@@ -1,6 +1,7 @@
 import json
 from simulation.core.cell_state import CellState
 from simulation.heatmaps.distance_heatmap_generator import DistanceHeatmapGenerator
+from simulation.heatmaps.infinity_heatmap_generator import InfinityHeatmapGenerator
 from simulation.heatmaps.distancing.euclidean_distance import EuclideanDistance
 from simulation.heatmaps.djisktra_heatmap_generator import DijkstraHeatmapGenerator
 from simulation.heatmaps.fast_marching_heatmap_generator import FastMarchingHeatmapGenerator
@@ -25,6 +26,8 @@ class SimulationConfigLoader:
             return DijkstraHeatmapGenerator(distancing, blocked_states)
         elif generator_name == "DistanceHeatmapGenerator":
             return DistanceHeatmapGenerator(distancing, blocked_states)
+        elif generator_name == "InfinityHeatmapGenerator":
+            return InfinityHeatmapGenerator(distancing, blocked_states)
         elif generator_name is None:
             return None
         else:

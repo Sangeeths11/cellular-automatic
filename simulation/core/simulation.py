@@ -16,6 +16,7 @@ from simulation.core.cell import Cell
 from simulation.core.cell_state import CellState
 from simulation.core.position import Position
 from simulation.core.spawner import Spawner
+from simulation.core.teleporter import Teleporter
 from simulation.core.target import Target
 from simulation.core.waypoint import Waypoint
 from simulation.heatmaps.distancing.base_distance import DistanceBase
@@ -29,11 +30,12 @@ from simulation.core.pedestrian import Pedestrian
 from simulation.core.simulation_grid import SimulationGrid
 from utils.immutable_list import ImmutableList
 from utils.utils import none_check
+from visualisation.flow_meter import FlowMeter
 
 class Simulation(Serializable):
     def __init__(self, time_resolution: float, grid: SimulationGrid, distancing: DistanceBase,
                  social_distancing: SocialDistancingHeatmapGenerator, targets: list[Target], spawners: list[Spawner],
-                 occupation_bias_modifier: float | None = 1.0, retargeting_threshold: float | None = -1.0, waypoint_threshold: float | None = None, waypoint_distance: int | None = None, waypoint_heatmap_generator: HeatmapGeneratorBase | None = None):
+                 occupation_bias_modifier: float | None = 1.0, retargeting_threshold: float | None = -1.0, waypoint_threshold: float | None = None, waypoint_distance: int | None = None, waypoint_heatmap_generator: HeatmapGeneratorBase | None = None, teleporter: Teleporter | None = None, flow_meter: list[FlowMeter] | None = None):
         self._pedestrians: list[Pedestrian] = list()
         self._grid: SimulationGrid = grid
         self._targets: list[Target] = targets
@@ -52,10 +54,21 @@ class Simulation(Serializable):
         self._waypoints: list[Waypoint] = []
         self._waypoint_pathfinding_heatmap_generator: DijkstraHeatmapGenerator = DijkstraHeatmapGenerator(distancing, {CellState.OBSTACLE, CellState.OCCUPIED})
         self._waypoint_heatmap_cache: dict[Target, Heatmap] = {}
+        self._teleporter = teleporter
+        self._number_of_movable_cells = self.get_number_of_movable_cells()
+        self._flow_meters: list[FlowMeter] = flow_meter
+        self._init_flow_meter_logs()
 
         waypoint_none, none_fields = none_check(waypoint_threshold=waypoint_threshold, waypoint_distance=waypoint_distance, waypoint_heatmap_generator=waypoint_heatmap_generator)
         if waypoint_none is False:
             raise SimulationError(SimulationErrorCode.VALUE_NOT_INITIALIZED, {"parameters": none_fields})
+
+    def get_number_of_movable_cells(self) -> int:
+        number_of_movable_cells = 0
+        for cell in self._grid.cells:
+            if not cell.get_state() == CellState.OBSTACLE:
+                number_of_movable_cells += 1
+        return number_of_movable_cells
 
     def get_waypoints(self) -> ImmutableList[Waypoint]:
         return ImmutableList(self._waypoints)
@@ -105,8 +118,15 @@ class Simulation(Serializable):
         self._update_targets()
         self._update_waypoints()
         self._update_pedestrians(delta)
+        self._update_flow_meters(delta)
         self._steps += 1
         self._run_time += delta
+
+    def _init_flow_meter_logs(self):
+        if self._flow_meters == None:
+            return
+        for flow_meter in self._flow_meters:
+            flow_meter.create_log()
 
     def _remove_waypoint(self, waypoint: Waypoint):
         waypoint.get_pedestrian().clear_waypoint()
@@ -118,10 +138,25 @@ class Simulation(Serializable):
         pedestrian.set_waypoint(waypoint)
 
     def _remove_pedestrian(self, pedestrian: Pedestrian):
-        self._pedestrians.remove(pedestrian)
-        cell = self._grid.get_cell_at_pos(pedestrian)
-        cell.remove_pedestrian()
-        pedestrian.set_reached_target()
+        if not self._teleporter:
+            self._pedestrians.remove(pedestrian)
+            cell = self._grid.get_cell_at_pos(pedestrian)
+            cell.remove_pedestrian()
+            pedestrian.set_reached_target()
+        if self._teleporter and self._teleporter.has_free_cell():
+            self._respawn_pedestrian_in_cell(pedestrian)
+            self._pedestrians.remove(pedestrian)
+            cell = self._grid.get_cell_at_pos(pedestrian)
+            cell.remove_pedestrian()
+            pedestrian.set_reached_target()
+
+    def _respawn_pedestrian_in_cell(self, pedestrian: Pedestrian) -> None:
+        speed = pedestrian.get_optimal_speed()
+        spawner = pedestrian.get_spawner()
+        target = pedestrian.get_target()
+        distancing = pedestrian.get_distancing()
+        time_alive = pedestrian.get_time_alive()
+        self._add_pedestrian(self._teleporter.spawn(speed, spawner, target, distancing, time_alive))
 
     def _add_pedestrian(self, pedestrian: Pedestrian):
         cell = self._grid.get_cell_at_pos(pedestrian)
@@ -152,8 +187,10 @@ class Simulation(Serializable):
 
     def _get_next_target_cell(self, heatmap: Heatmap, pos: Position, last_pos: Position) -> Cell | None:
         neighbours = self._grid.get_neighbours_at(pos)
-        for cell in sorted(neighbours, key=lambda n: self._get_cell_value(last_pos, n, heatmap)):
-            if self._occupation_bias_modifier is not None or cell.is_free():
+        neigbour_values = [(cell, self._get_cell_value(last_pos, cell, heatmap)) for cell in neighbours]
+        sorted_neighbours = sorted(neigbour_values, key=lambda n: n[1]); 
+        for cell, value in sorted_neighbours:
+            if (self._occupation_bias_modifier is not None or cell.is_free()) and value != Heatmap.INFINITY:
                 return cell
 
         return None
@@ -231,6 +268,15 @@ class Simulation(Serializable):
                 # pedestrian is stuck, do nothing
 
 
+    def _update_flow_meters(self, delta: float) -> None:
+        if self._flow_meters == None:
+            return
+        pedestrian_densety = self._get_pedestrian_density()
+        for flow_meter in self._flow_meters:
+            flow_meter.log(delta, self._run_time, pedestrian_densety)
+
+    def _get_pedestrian_density(self) -> float:
+        return len(self._pedestrians) / self._number_of_movable_cells 
 
     def _update_waypoints(self):
         self._waypoint_heatmap_cache.clear()
