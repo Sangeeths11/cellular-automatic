@@ -24,13 +24,22 @@
   ],
   "spawners": [
     {
-      "name": "Spawner",
+      "name": "initial Spawner",
       "rect": [0, 1, 104, 9],
       "targets": ["Target"],
       "total_spawns": 600,
       "batch_size": 600,
-      "spawn_delay": 1,
-      "initial_delay": 0.0
+      "spawn_delay": 1.0,
+      "initial_delay": 0
+    },
+    {
+      "name": "Spawner",
+      "rect": [0, 1, 104, 9],
+      "targets": ["Target"],
+      "total_spawns": 600,
+      "batch_size": 30,
+      "spawn_delay": 45,
+      "initial_delay": 5.0
     }
   ],
   "targets": [
@@ -63,8 +72,9 @@
     {
       "name": "FlowMeter",
       "rect": [46, 1, 46, 9],
-      "time_span": 60,
-      "logName": "flowmeter_log.json"
+      "time_span": 44,
+      "logfile": "flowMeterHigh.csv",
+      "log_interval": 45
     }
   ],
   "distancing": {
