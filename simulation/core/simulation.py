@@ -177,17 +177,18 @@ class Simulation(Serializable):
         for target in self._targets:
             target.update_heatmap()
 
-    def _get_cell_value(self, last_pos: Position, cell: Cell, heatmap: Heatmap) -> float:
+    def _get_cell_value(self, pos: Position, last_pos: Position, cell: Cell, heatmap: Heatmap) -> float:
         value = heatmap.get_cell_at_pos(cell)
         value += min(0, self._distancing_heatmap.get_cell_at_pos(cell) - self._social_distancing_generator.get_bias(last_pos, cell))
         if self._occupation_bias_modifier is not None:
             value += (self._occupation_bias_modifier * cell.get_pedestrian().get_occupation_bias()) if cell.is_occupied() else 0
 
+        value += self._distancing.calculate_distance(pos, cell)
         return value
 
     def _get_next_target_cell(self, heatmap: Heatmap, pos: Position, last_pos: Position) -> Cell | None:
         neighbours = self._grid.get_neighbours_at(pos)
-        neigbour_values = [(cell, self._get_cell_value(last_pos, cell, heatmap)) for cell in neighbours]
+        neigbour_values = [(cell, self._get_cell_value(pos, last_pos, cell, heatmap)) for cell in neighbours]
         sorted_neighbours = sorted(neigbour_values, key=lambda n: n[1]); 
         for cell, value in sorted_neighbours:
             if (self._occupation_bias_modifier is not None or cell.is_free()) and value != Heatmap.INFINITY:
