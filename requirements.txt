@@ -1,2 +1,5 @@
-pygame
 numpy
+scipy
+pygame
+pandas
+matplotlib

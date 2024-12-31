@@ -1,0 +1,88 @@
+{
+  "grid": {
+    "width": 51,
+    "height": 51,
+    "neighbourhood": "MooreNeighbourhood"
+  },
+  "spawners": [
+    {
+      "name": "upper_left",
+      "rect": [24, 24, 24, 24],
+      "targets": ["door_upper_left"],
+      "total_spawns": 1,
+      "batch_size": 1,
+      "spawn_delay": 1,
+      "initial_delay": 0.0,
+      "targeting": "CLOSEST"
+    },
+    {
+      "name": "upper_right",
+      "rect": [25, 25, 25, 25],
+      "targets": ["door_upper_right"],
+      "total_spawns": 1,
+      "batch_size": 1,
+      "spawn_delay": 1,
+      "initial_delay": 0.0,
+      "targeting": "CLOSEST"
+    },
+    {
+      "name": "lower_left",
+      "rect": [24, 24, 25, 25],
+      "targets": ["door_lower_left"],
+      "total_spawns": 1,
+      "batch_size": 1,
+      "spawn_delay": 1,
+      "initial_delay": 0.0,
+      "targeting": "CLOSEST"
+    },
+    {
+      "name": "lower_right",
+      "rect": [25, 25, 25, 25],
+      "targets": ["door_lower_right"],
+      "total_spawns": 1,
+      "batch_size": 1,
+      "spawn_delay": 1,
+      "initial_delay": 0.0,
+      "targeting": "CLOSEST"
+    }
+  ],
+  "targets": [
+    {
+      "name": "door_upper_left",
+      "rect": [13, 0, 13, 0],
+      "heatmap_generator": "DistanceHeatmapGenerator",
+      "cellstate": ["OBSTACLE"]
+    },
+    {
+      "name": "door_upper_right",
+      "rect": [50, 13, 50, 13],
+      "heatmap_generator": "DistanceHeatmapGenerator",
+      "cellstate": ["OBSTACLE"]
+    },
+    {
+      "name": "door_lower_right",
+      "rect": [37, 50, 37, 50],
+      "heatmap_generator": "DistanceHeatmapGenerator",
+      "cellstate": ["OBSTACLE"]
+    },
+    {
+      "name": "door_lower_left",
+      "rect": [0, 37, 0, 37],
+      "heatmap_generator": "DistanceHeatmapGenerator",
+      "cellstate": ["OBSTACLE"]
+    }
+  ],
+  "social_distancing": {
+    "width": 3,
+    "height": 3
+  },
+  "simulation": {
+    "time_resolution": 0.1,
+    "occupation_bias_modifier": 1.0,
+    "retargeting_threshold": -2.0
+  },
+  "distancing": {
+    "type": "EuclideanDistance",
+    "scale": 0.4
+  }
+}

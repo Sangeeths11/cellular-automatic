@@ -1,0 +1,40 @@
+{
+  "grid": {
+    "width": 51,
+    "height": 51,
+    "neighbourhood": "MooreNeighbourhood"
+  },
+  "spawners": [
+    {
+      "name": "Spawner",
+      "rect": [25, 25, 25, 25],
+      "targets": ["door"],
+      "total_spawns": 1,
+      "batch_size": 1,
+      "spawn_delay": 1,
+      "initial_delay": 0.0,
+      "targeting": "CLOSEST"
+    }
+  ],
+  "targets": [
+    {
+      "name": "door",
+      "rect": [0, 25, 0, 25],
+      "heatmap_generator": "FastMarchingHeatmapGenerator",
+      "cellstate": ["OBSTACLE"]
+    }
+  ],
+  "social_distancing": {
+    "width": 3,
+    "height": 3
+  },
+  "simulation": {
+    "time_resolution": 0.1,
+    "occupation_bias_modifier": 1.0,
+    "retargeting_threshold": -2.0
+  },
+  "distancing": {
+    "type": "EuclideanDistance",
+    "scale": 0.4
+  }
+}
